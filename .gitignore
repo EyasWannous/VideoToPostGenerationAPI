@@ -363,5 +363,8 @@ MigrationBackup/
 FodyWeavers.xsd
 
 
-#ffprobe.exe
+# ffprobe.exe
 ffprobe.exe
+
+# assets
+wwwroot/assets
