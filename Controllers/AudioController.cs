@@ -87,4 +87,32 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         );
     }
 
+    [HttpGet("all")]
+    public async Task<IActionResult> GetAllAudios()
+    {
+        var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
+        
+        var audios = await _unitOfWork.Audios.GetAllByUserIdAsync(loggedinUser!.Id);
+
+        var mappedAudios = audios.Select(_mapper.Map<ResponseAudio>).ToList();
+
+        return Ok(mappedAudios);
+    }
+
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetAudioById([FromRoute] int id)
+    {
+        var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
+        
+        var audio = await _unitOfWork.Audios.GetByIdAsync(id);
+        if (audio is null || audio.User.Id != loggedinUser!.Id)
+            return BadRequest();
+
+        var mappedAudio = _mapper.Map<ResponseAudio>(audio);
+        if (mappedAudio is null)
+            return BadRequest();
+
+        return Ok(mappedAudio);
+    }
 }
