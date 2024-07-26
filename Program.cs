@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -23,7 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddRouting(configureOptions =>
 {
-    configureOptions.LowercaseQueryStrings = true;
+    configureOptions.LowercaseUrls = true;
 });
 
 // Add automapper
@@ -34,6 +32,9 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IFileService, FileService>();
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IPostService, PostService>();
 
 // Swagger Authorization
 builder.Services.AddSwaggerGen(option =>
