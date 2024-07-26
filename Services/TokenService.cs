@@ -8,7 +8,6 @@ using VideoToPostGenerationAPI.Domain.Abstractions;
 using VideoToPostGenerationAPI.Domain.Abstractions.IServices;
 using VideoToPostGenerationAPI.Domain.Entities;
 using VideoToPostGenerationAPI.Domain.Settings;
-using VideoToPostGenerationAPI.Services.Helpers;
 
 namespace VideoToPostGenerationAPI.Services;
 

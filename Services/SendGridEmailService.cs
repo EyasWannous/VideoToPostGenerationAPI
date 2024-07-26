@@ -1,6 +1,5 @@
 ﻿using SendGrid.Helpers.Mail;
 using SendGrid;
-using Microsoft.Extensions.Configuration;
 using VideoToPostGenerationAPI.Domain.Abstractions.IServices;
 
 namespace VideoToPostGenerationAPI.Services;
