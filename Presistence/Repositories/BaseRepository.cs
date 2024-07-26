@@ -10,14 +10,15 @@ public class BaseRepository<T>(AppDbContext context) : IBaseRepository<T> where 
     protected AppDbContext _context = context;
 
     public async Task<IEnumerable<T>> GetAllAsync()
-    {
-        return await _context.Set<T>().AsNoTracking().ToListAsync();
-    }
+        => await _context
+            .Set<T>()
+            .AsNoTracking()
+            .ToListAsync();
 
     public async Task<T?> GetByIdAsync(int id)
-    {
-        return await _context.Set<T>().FindAsync(id);
-    }
+        => await _context
+            .Set<T>()
+            .FindAsync(id);
 
     public async Task<T?> FindAsync(Expression<Func<T, bool>> criteria, string[]? includes = null)
     {
@@ -44,15 +45,15 @@ public class BaseRepository<T>(AppDbContext context) : IBaseRepository<T> where 
         return Task.CompletedTask;
     }
 
-    public async Task<int> CountAsync()
-    {
-        return await _context.Set<T>().CountAsync();
-    }
+    public async Task<int> CountAsync() 
+        => await _context
+            .Set<T>()
+            .CountAsync();
 
     public async Task<int> CountAsync(Expression<Func<T, bool>> criteria)
-    {
-        return await _context.Set<T>().CountAsync(criteria);
-    }
+        =>await _context
+            .Set<T>()
+            .CountAsync(criteria);
 
     public async Task<IEnumerable<T>> Paginate(int pageNumber = 1, int pageSize = 10, string[]? includes = null)
     {
