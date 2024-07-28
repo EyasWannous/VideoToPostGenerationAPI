@@ -8,15 +8,16 @@ using VideoToPostGenerationAPI.Domain.Entities;
 using VideoToPostGenerationAPI.Domain.Enums;
 using VideoToPostGenerationAPI.Domain.Settings;
 using VideoToPostGenerationAPI.DTOs.Outgoing;
-using VideoToPostGenerationAPI.Services.Helpers;
 
 namespace VideoToPostGenerationAPI.Controllers;
 
 [Authorize]
 public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService,
-    UserManager<User> userManager) : BaseController(unitOfWork, mapper)
+    IWhisperService whisperService, IYouTubeService youTubeService, UserManager<User> userManager) : BaseController(unitOfWork, mapper)
 {
     private readonly IFileService _fileService = fileService;
+    private readonly IWhisperService _whisperService = whisperService;
+    private readonly IYouTubeService _youTubeService = youTubeService;
     private readonly UserManager<User> _userManager = userManager;
 
     [HttpPost("upload")]
@@ -24,7 +25,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
     {
         var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
 
-        var result = await _fileService.StoreAsync<VideoExtension>(file, $"{FileSettings.VideosPath}");
+        var result = await _fileService.StoreAsync<VideoExtension>(file, FileSettings.VideosPath);
         if (!result.IsSuccess)
             return BadRequest(result.Message);
 
@@ -35,10 +36,15 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         var audioExtension = Path.GetExtension(audioFullPath);
         var audioLink = $"{FileSettings.AudiosPath}{audioFullPath.Split('\\').Last()}";
         
+        var audioTranscript = await _whisperService.GetTranscriptAsync(audioLink);
+        if (audioTranscript is null)
+            return BadRequest();
+
         var audio = new Audio
         {
             SizeBytes = await _fileService.GetFileSizeAsync(audioLink),
-            AudioExtension = FileExtensionsHelper.GetExtension<AudioExtension>(audioExtension.Split('.').Last()) ?? AudioExtension.None,
+            AudioExtension = audioExtension.Split('.').Last() ?? AudioExtension.None.ToString(),
+            Transcript = audioTranscript.Text,
             Link = audioLink,
             Duration = duration,
             UserId = loggedinUser!.Id,
@@ -49,7 +55,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         {
             SizeBytes = file.Length,
             Link = result.Link,
-            VideoExtension = FileExtensionsHelper.GetExtension<VideoExtension>(videoExtension.Split('.').Last()) ?? VideoExtension.None,
+            VideoExtension = videoExtension.Split('.').Last() ?? VideoExtension.None.ToString(),
             Audio = audio,
             AudioId = audio.Id,
         };
@@ -83,10 +89,23 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         var audioExtension = Path.GetExtension(audioFullPath);
         var audioLink = $"{FileSettings.AudiosPath}{audioFullPath.Split('\\').Last()}";
 
+        var audioTranscript = await _youTubeService.GetVideoCaptions(link, "en");
+        if (audioTranscript is null)
+        {
+            var transcriptionResponse = await _whisperService.GetTranscriptAsync(audioLink);
+
+            audioTranscript = transcriptionResponse?.Text;
+        }
+
+        if (audioTranscript is null)
+            return BadRequest();
+
         var audio = new Audio
         {
             SizeBytes = await _fileService.GetFileSizeAsync(audioLink),
-            AudioExtension = FileExtensionsHelper.GetExtension<AudioExtension>(audioExtension.Split('.').Last()) ?? AudioExtension.None,
+            AudioExtension = audioExtension.Split('.').Last() ?? AudioExtension.None.ToString(),
+            Transcript = audioTranscript,
+            YoutubeLink = link,
             Link = audioLink,
             Duration = duration,
             UserId = loggedinUser!.Id,
@@ -97,7 +116,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         {
             SizeBytes = await _fileService.GetFileSizeAsync(videoLink),
             Link = videoLink,
-            VideoExtension = FileExtensionsHelper.GetExtension<VideoExtension>(videoExtension.Split('.').Last()) ?? VideoExtension.None,
+            VideoExtension = videoExtension.Split('.').Last() ?? VideoExtension.None.ToString(),
             Audio = audio,
             AudioId = audio.Id,
         };
