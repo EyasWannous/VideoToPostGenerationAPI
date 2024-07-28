@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using VideoToPostGenerationAPI.Domain.Abstractions;
@@ -9,6 +10,7 @@ using VideoToPostGenerationAPI.DTOs.Outgoing;
 
 namespace VideoToPostGenerationAPI.Controllers;
 
+[Authorize]
 public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
     IPostService postService, UserManager<User> userManager) : BaseController(unitOfWork, mapper)
 {
