@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.StaticFiles;
-using NAudio.Wave;
 using NReco.VideoConverter;
 using NYoutubeDL;
 using System.IO.Compression;
@@ -103,7 +102,7 @@ public class FileService(IWebHostEnvironment env) : IFileService
 
         var outputFileName = inputFullPath.Split('\\').Last().Split('.').First();
 
-        var outputFullPath = Path.Combine(_env.WebRootPath, $"{FileSettings.AudiosPath}{outputFileName}") + ".wav";
+        var outputFullPath = Path.Combine(_env.WebRootPath, FileSettings.AudiosPath, outputFileName) + ".wav";
 
         var ffMpeg = new FFMpegConverter();
         ffMpeg.ConvertMedia(inputFullPath, outputFullPath, "wav");
@@ -113,13 +112,19 @@ public class FileService(IWebHostEnvironment env) : IFileService
 
     public async Task<string?> DownloadFileAsync(string folderPath, string link, bool downloadAudio)
     {
-        var filePath = Path.Combine(_env.WebRootPath, $"{folderPath}{Guid.NewGuid()}");
+        var fileGuid = Guid.NewGuid().ToString();
+
+        var filePath = Path.Combine(_env.WebRootPath, folderPath, fileGuid);
+        var filePathTemplate = Path.Combine(_env.WebRootPath, folderPath, $"{fileGuid}.%(ext)s");
 
         var youtubeDl = new YoutubeDLP();
 
-        youtubeDl.Options.FilesystemOptions.Output = filePath;
+        youtubeDl.Options.FilesystemOptions.Output = filePathTemplate;
+
+        //youtubeDl.Options.FilesystemOptions.Output = filePath;
         youtubeDl.Options.PostProcessingOptions.ExtractAudio = downloadAudio;
         youtubeDl.VideoUrl = link;
+
         // Or update the binary
         //youtubeDl.Options.GeneralOptions.Update = true;
 
