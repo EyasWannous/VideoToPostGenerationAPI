@@ -14,7 +14,7 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
 
     public IAudioRepository Audios { get; } = new AudioRepository(context);
 
-    public IGeneralPostRepository GeneralPosts { get; } = new GeneralPostRepository(context);
+    public IHeaderRepository Headers { get; } = new HeaderRepository(context);
 
     public IPostRepository Posts { get; } = new PostRepository(context);
 

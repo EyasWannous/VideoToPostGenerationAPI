@@ -4,7 +4,7 @@ namespace VideoToPostGenerationAPI.Domain.Entities;
 
 public class Video : BaseFile
 {
-    public VideoExtension VideoExtension { get; set; }
+    public string VideoExtension { get; set; } = string.Empty;
     public int AudioId { get; set; }
     public Audio Audio { get; set; }
 }

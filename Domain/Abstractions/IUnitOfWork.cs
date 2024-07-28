@@ -7,7 +7,7 @@ public interface IUnitOfWork : IDisposable
     IUserRepository Users { get; }
     IVideoRepository Videos { get; }
     IAudioRepository Audios { get; }
-    IGeneralPostRepository GeneralPosts { get; }
+    IHeaderRepository Headers { get; }
     IPostRepository Posts { get; }
     IImageRepository Images { get; }
     Task<int> CompleteAsync();

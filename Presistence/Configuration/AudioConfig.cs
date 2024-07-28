@@ -30,9 +30,9 @@ public class AudioConfig : IEntityTypeConfiguration<Audio>
             .HasForeignKey<Video>(video => video.AudioId)
             .IsRequired(false);
 
-        builder.HasMany(audio => audio.GeneralPosts)
-            .WithOne(generalPost => generalPost.Audio)
-            .HasForeignKey(generalPost => generalPost.AudioId)
+        builder.HasMany(audio => audio.Posts)
+            .WithOne(posts => posts.Audio)
+            .HasForeignKey(posts => posts.AudioId)
             .IsRequired();
 
         builder.ToTable("Audios");

@@ -10,17 +10,16 @@ public class PostConfig : IEntityTypeConfiguration<Post>
     {
         builder.HasKey(post => post.Id);
 
-        builder.Property(post => post.Title)
-            .IsRequired();
-
         builder.Property(post => post.Description)
             .IsRequired();
 
         builder.Property(post => post.Platform)
             .IsRequired();
 
-        builder.Property(post => post.GeneralPostId)
-            .IsRequired();
+        builder.HasOne(post => post.Header)
+            .WithOne(header => header.Post)
+            .HasForeignKey<Header>(header => header.PostId)
+            .IsRequired(false);
 
         builder.HasMany(post => post.Images)
             .WithOne(image => image.Post)

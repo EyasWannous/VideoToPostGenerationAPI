@@ -1,13 +1,14 @@
-﻿using VideoToPostGenerationAPI.Domain.Enums;
+﻿
+using VideoToPostGenerationAPI.Domain.Enums;
 
 namespace VideoToPostGenerationAPI.Domain.Entities;
 
 public class Post : BaseEntitiy
 {
-    public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public Platform Platform { get; set; }
-    public int GeneralPostId { get; set; }
-    public GeneralPost GeneralPost { get; set; }
+    public string Platform { get; set; } = string.Empty;
+    public int AudioId { get; set; }
+    public Audio Audio { get; set; }
+    public Header? Header { get; set; }
     public List<Image> Images { get; set; } = [];
 }

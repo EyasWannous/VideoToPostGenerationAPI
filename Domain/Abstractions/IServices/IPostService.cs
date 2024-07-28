@@ -1,10 +1,10 @@
-﻿using VideoToPostGenerationAPI.Services;
+﻿using VideoToPostGenerationAPI.DTOs.Incoming;
+using VideoToPostGenerationAPI.DTOs.Outgoing;
+using VideoToPostGenerationAPI.Services;
 
 namespace VideoToPostGenerationAPI.Domain.Abstractions.IServices;
 
-public interface IPostService
+public interface IPostService : IDisposable
 {
-    public Task<string> GetPostAsync();
-    public Task<string> GetSomething(string itemName, int quantity);
-    public Task<PostService.ScoringItem?> PostScoringItemAsync(PostService.ScoringItem item);
+    Task<PostResponse?> GetPostAsync(PostRequest post, string paltform);
 }

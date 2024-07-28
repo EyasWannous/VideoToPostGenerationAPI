@@ -9,9 +9,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbCo
 {
     public DbSet<Video> Videos { get; set; }
     public DbSet<Audio> Audios { get; set; }
-    public DbSet<GeneralPost> GeneralPosts { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<Image> Images { get; set; }
+    public DbSet<Header> Headers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
