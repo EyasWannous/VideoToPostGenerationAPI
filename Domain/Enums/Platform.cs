@@ -2,7 +2,8 @@
 
 public enum Platform
 {
-    None = 0,
+    Blog,
     LinkedIn,
-    FaceBook
+    FaceBook,
+    Twitter
 }
