@@ -14,7 +14,6 @@ using VideoToPostGenerationAPI.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -35,6 +34,8 @@ builder.Services.AddScoped<IFileService, FileService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IPostService, PostService>();
+builder.Services.AddScoped<IWhisperService, WhisperService>();
+builder.Services.AddScoped<IYouTubeService, YouTubeService>();
 
 // Swagger Authorization
 builder.Services.AddSwaggerGen(option =>
