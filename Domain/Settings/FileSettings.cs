@@ -2,7 +2,6 @@
 
 public static class FileSettings
 {
-    public const string WebRootPath = "C:\\Users\\eyasw\\Desktop\\VideoToPostGenerationAPI\\wwwroot\\";
     public const string ImagesPath = "assets\\images\\"; // @"assets\images\"
     public const string AudiosPath = "assets\\audios\\"; // @"assets\audios\"
     public const string VideosPath = "assets\\videos\\"; // @"assets\videos\"
