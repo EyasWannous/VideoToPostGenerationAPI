@@ -35,37 +35,39 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         var audioFullPath = await _fileService.ConvertVideoToAudioAsync(result.Link);
         var audioExtension = Path.GetExtension(audioFullPath);
         var audioLink = $"{FileSettings.AudiosPath}{audioFullPath.Split('\\').Last()}";
-        
-        var audioTranscript = await _whisperService.GetTranscriptAsync(audioLink);
-        if (audioTranscript is null)
+
+        var transcript = await _whisperService.GetTranscriptAsync(audioLink);
+        if (transcript is null)
             return BadRequest();
 
-        var audio = new Audio
+        var video = new Video
         {
-            SizeBytes = await _fileService.GetFileSizeAsync(audioLink),
-            AudioExtension = audioExtension.Split('.').Last() ?? AudioExtension.None.ToString(),
-            Transcript = audioTranscript.Text,
-            Link = audioLink,
+            SizeBytes = file.Length,
+            VideoExtension = videoExtension.Split('.').Last() ?? VideoExtension.None.ToString(),
+            Transcript = transcript.Text,
+            Link = result.Link,
             Duration = duration,
             UserId = loggedinUser!.Id,
             User = loggedinUser
         };
 
-        var video = new Video
+        var audio = new Audio
         {
-            SizeBytes = file.Length,
-            Link = result.Link,
-            VideoExtension = videoExtension.Split('.').Last() ?? VideoExtension.None.ToString(),
-            Audio = audio,
-            AudioId = audio.Id,
+            SizeBytes = await _fileService.GetFileSizeAsync(audioLink),
+            Link = audioLink,
+            AudioExtension = audioExtension.Split('.').Last() ?? AudioExtension.None.ToString(),
+            Video = video,
+            VideoId = video.Id,
         };
 
-        audio.Video = video;
+        video.Audio = audio;
 
         await _unitOfWork.Audios.AddAsync(audio);
         await _unitOfWork.Videos.AddAsync(video);
 
         await _unitOfWork.CompleteAsync();
+
+        result.Video = _mapper.Map<ResponseVideo>(video);
 
         return Ok(result);
     }
@@ -89,39 +91,39 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         var audioExtension = Path.GetExtension(audioFullPath);
         var audioLink = $"{FileSettings.AudiosPath}{audioFullPath.Split('\\').Last()}";
 
-        var audioTranscript = await _youTubeService.GetVideoCaptions(link, "en");
-        if (audioTranscript is null)
+        var transcript = await _youTubeService.GetVideoCaptions(link, "en");
+        if (transcript is null)
         {
             var transcriptionResponse = await _whisperService.GetTranscriptAsync(audioLink);
 
-            audioTranscript = transcriptionResponse?.Text;
+            transcript = transcriptionResponse?.Text;
         }
 
-        if (audioTranscript is null)
+        if (transcript is null)
             return BadRequest();
 
-        var audio = new Audio
+        var video = new Video
         {
-            SizeBytes = await _fileService.GetFileSizeAsync(audioLink),
-            AudioExtension = audioExtension.Split('.').Last() ?? AudioExtension.None.ToString(),
-            Transcript = audioTranscript,
+            SizeBytes = await _fileService.GetFileSizeAsync(videoLink),
+            VideoExtension = videoExtension.Split('.').Last() ?? VideoExtension.None.ToString(),
+            Transcript = transcript,
             YoutubeLink = link,
-            Link = audioLink,
+            Link = videoLink,
             Duration = duration,
             UserId = loggedinUser!.Id,
             User = loggedinUser
         };
 
-        var video = new Video
+        var audio = new Audio
         {
-            SizeBytes = await _fileService.GetFileSizeAsync(videoLink),
-            Link = videoLink,
-            VideoExtension = videoExtension.Split('.').Last() ?? VideoExtension.None.ToString(),
-            Audio = audio,
-            AudioId = audio.Id,
+            SizeBytes = await _fileService.GetFileSizeAsync(audioLink),
+            Link = audioLink,
+            AudioExtension = audioExtension.Split('.').Last() ?? AudioExtension.None.ToString(),
+            Video = video,
+            VideoId = video.Id,
         };
 
-        audio.Video = video;
+        video.Audio = audio;
 
         await _unitOfWork.Audios.AddAsync(audio);
         await _unitOfWork.Videos.AddAsync(video);
@@ -132,6 +134,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         (
             new ResponseUploadFile
             {
+                Video = _mapper.Map<ResponseVideo>(video),
                 Link = videoLink,
                 IsSuccess = true,
                 Message = "Video Download Successfully",
@@ -152,13 +155,13 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
     }
 
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetVideoById([FromRoute] int id)
     {
         var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
 
         var video = await _unitOfWork.Videos.GetByIdAsync(id);
-        if (video is null || video.Audio.User.Id != loggedinUser!.Id)
+        if (video is null || video.User.Id != loggedinUser!.Id)
             return BadRequest();
 
         var mappedVideo = _mapper.Map<ResponseVideo>(video);
@@ -166,5 +169,27 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
             return BadRequest();
 
         return Ok(mappedVideo);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeleteVideo([FromRoute] int id)
+    {
+        var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
+
+        var video = await _unitOfWork.Videos.GetByIdAsync(id);
+        if (video is null || video.User.Id != loggedinUser!.Id)
+            return BadRequest();
+
+        var tasks = new List<Task>
+        {
+            _fileService.DeleteFileAsync(video.Link),
+            _unitOfWork.Videos.DeleteAsync(video),
+        };
+
+        await Task.WhenAll(tasks);
+
+        await _unitOfWork.CompleteAsync();
+
+        return NoContent();
     }
 }

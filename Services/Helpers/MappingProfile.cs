@@ -8,8 +8,7 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Audio, ResponseAudio>();
-
         CreateMap<Video, ResponseVideo>();
+        //CreateMap<Audio, ResponseAudio>();
     }
 }

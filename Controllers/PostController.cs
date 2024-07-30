@@ -17,19 +17,19 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
     private readonly IPostService _postService = postService;
     private readonly UserManager<User> _userManager = userManager;
 
-    [HttpGet("{audioId:int}/{platform}")]
-    public async Task<IActionResult> GetPosts([FromRoute] int audioId, [FromRoute] string platform)
+    [HttpGet("{videoId:int}/{platform}")]
+    public async Task<IActionResult> GetPosts([FromRoute] int videoId, [FromRoute] string platform)
     {
         var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
 
-        var audio = await _unitOfWork.Audios.GetByIdAsync(audioId);
-        if (audio is null || audio.UserId != loggedinUser!.Id)
+        var video = await _unitOfWork.Videos.GetByIdAsync(videoId);
+        if (video is null || video.UserId != loggedinUser!.Id)
             return BadRequest();
 
         var postReqiest = new PostRequest
         {
-            Link = audio.YoutubeLink ?? "No Link",
-            Script = audio.Transcript,
+            Link = video.YoutubeLink ?? "No Link",
+            Script = video.Transcript,
         };
 
         var result = await _postService.GetPostAsync(postReqiest, platform);
@@ -39,8 +39,8 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
         var post = new Post
         {
             Description = result.Post,
-            AudioId = audio.Id,
-            Audio = audio,
+            AudioId = video.Id,
+            Audio = video,
         };
 
         if (platform.Equals(Platform.Blog.ToString(), StringComparison.CurrentCultureIgnoreCase))
@@ -56,7 +56,7 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
         }
 
 
-        audio.Posts.Add(post);
+        video.Posts.Add(post);
 
         await _unitOfWork.CompleteAsync();
 

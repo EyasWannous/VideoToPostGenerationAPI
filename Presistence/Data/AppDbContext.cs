@@ -7,8 +7,8 @@ namespace VideoToPostGenerationAPI.Presistence.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext<User, IdentityRole<int>, int>(options)
 {
-    public DbSet<Video> Videos { get; set; }
-    public DbSet<Audio> Audios { get; set; }
+    public DbSet<Audio> Videos { get; set; }
+    public DbSet<Video> Audios { get; set; }
     public DbSet<Post> Posts { get; set; }
     public DbSet<Image> Images { get; set; }
     public DbSet<Header> Headers { get; set; }

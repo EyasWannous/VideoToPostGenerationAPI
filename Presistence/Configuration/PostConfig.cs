@@ -19,12 +19,14 @@ public class PostConfig : IEntityTypeConfiguration<Post>
         builder.HasOne(post => post.Header)
             .WithOne(header => header.Post)
             .HasForeignKey<Header>(header => header.PostId)
-            .IsRequired(false);
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(post => post.Images)
             .WithOne(image => image.Post)
             .HasForeignKey(image => image.PostId)
-            .IsRequired();
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.ToTable("Posts");
     }

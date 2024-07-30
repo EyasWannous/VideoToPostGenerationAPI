@@ -7,9 +7,9 @@ public record ResponseVideo
     public int Id { get; set; }
     public long SizeBytes { get; set; }
     public string Link { get; set; } = string.Empty;
-    public string VideoExtension { get; set; } = string.Empty;
-    public ResponseAudio Audio { get; set; }
+    public string YoutubeLink { get; set; } = string.Empty;
+    public string AudioExtension { get; set; } = string.Empty;
+    public int Duration { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
-
 }

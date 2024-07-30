@@ -5,19 +5,19 @@ using VideoToPostGenerationAPI.Presistence.Data;
 
 namespace VideoToPostGenerationAPI.Presistence.Repositories;
 
-public class VideoRepository(AppDbContext context) : BaseRepository<Video>(context) , IVideoRepository
+public class VideoRepository(AppDbContext context) : BaseRepository<Video>(context), IVideoRepository
 {
     public async Task<IEnumerable<Video>> GetAllByUserIdAsync(int userId)
-    => await _context.Videos
-        .Where(video => video.Audio.UserId == userId)
-        .Include("Audio")
-        .AsNoTracking()
-        .ToListAsync();
+        => await _context.Audios
+            .Where(audio => audio.UserId == userId)
+            .AsNoTracking()
+            .ToListAsync();
 
-    public new async Task<Video?> GetByIdAsync(int id)
-    => await _context
-        .Videos
-        .Where(video => video.Id == id)
-        .Include("Audio")
-        .FirstAsync();
+    public async Task<Video?> GetByIdToDeleteAsync(int id)
+        => await _context.Audios
+            .Where(audio => audio.Id == id)
+            .Include("Video")
+            .Include("Posts")
+            .Include("Images")
+            .FirstAsync();
 }

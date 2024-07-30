@@ -12,7 +12,7 @@ public class PostService : IPostService
 {
     private bool _disposed = false;
     //private const string BaseURL = "http://127.0.0.1:8000/";
-    private const string BaseURL = "http://192.168.1.4:8000/";
+    private const string BaseURL = "http://192.168.1.9:8000/api/";
     private readonly HttpClient _client;
 
     public PostService(HttpClient client)
@@ -25,7 +25,7 @@ public class PostService : IPostService
     public async Task<PostResponse?> GetPostAsync(PostRequest post, string paltform)
     {
         var json = JsonSerializer.Serialize(post);
-        var request = new HttpRequestMessage(HttpMethod.Post, $"http://192.168.1.4:8000/{paltform}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{BaseURL}{paltform}");
 
         var content = new StringContent(json, null, "application/json");
         

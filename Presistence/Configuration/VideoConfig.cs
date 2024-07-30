@@ -19,8 +19,23 @@ public class VideoConfig : IEntityTypeConfiguration<Video>
         builder.Property(video => video.VideoExtension)
             .IsRequired();
 
-        builder.Property(video => video.AudioId)
+        builder.Property(video => video.Duration)
             .IsRequired();
+
+        builder.Property(video => video.UserId)
+            .IsRequired();
+
+        builder.HasOne(video => video.Audio)
+            .WithOne(audio => audio.Video)
+            .HasForeignKey<Audio>(audio => audio.VideoId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(video => video.Posts)
+            .WithOne(posts => posts.Audio)
+            .HasForeignKey(posts => posts.AudioId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.ToTable("Videos");
     }

@@ -19,20 +19,7 @@ public class AudioConfig : IEntityTypeConfiguration<Audio>
         builder.Property(audio => audio.AudioExtension)
             .IsRequired();
 
-        builder.Property(audio => audio.Duration)
-            .IsRequired();
-
-        builder.Property(audio => audio.UserId)
-            .IsRequired();
-
-        builder.HasOne(audio => audio.Video)
-            .WithOne(video => video.Audio)
-            .HasForeignKey<Video>(video => video.AudioId)
-            .IsRequired(false);
-
-        builder.HasMany(audio => audio.Posts)
-            .WithOne(posts => posts.Audio)
-            .HasForeignKey(posts => posts.AudioId)
+        builder.Property(audio => audio.VideoId)
             .IsRequired();
 
         builder.ToTable("Audios");

@@ -10,9 +10,9 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
     private readonly AppDbContext _context = context;
     public IUserRepository Users { get; } = new UserRepository(context);
 
-    public IVideoRepository Videos { get; }  = new VideoRepository(context);
-
-    public IAudioRepository Audios { get; } = new AudioRepository(context);
+    public IVideoRepository Videos { get; } = new VideoRepository(context);
+    
+    public IAudioRepository Audios { get; }  = new AudioRepository(context);
 
     public IHeaderRepository Headers { get; } = new HeaderRepository(context);
 

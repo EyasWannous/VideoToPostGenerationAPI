@@ -54,7 +54,7 @@ public class FileService(IWebHostEnvironment env) : IFileService
         return await File.ReadAllBytesAsync(fullPath);
     }
 
-    public void Delete(string? filePath)
+    public async Task DeleteFileAsync(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath))
             return;
@@ -62,6 +62,8 @@ public class FileService(IWebHostEnvironment env) : IFileService
         var fullPath = Path.Combine(_env.WebRootPath, filePath);
 
         File.Delete(fullPath);
+
+        await Task.CompletedTask;
     }
 
     public async Task<IFormFile> MakeFileAsync(byte[] fileBytes, string fileName, string contentType)
