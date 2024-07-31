@@ -32,8 +32,8 @@ public class VideoConfig : IEntityTypeConfiguration<Video>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasMany(video => video.Posts)
-            .WithOne(posts => posts.Audio)
-            .HasForeignKey(posts => posts.AudioId)
+            .WithOne(posts => posts.Video)
+            .HasForeignKey(posts => posts.VideoId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
