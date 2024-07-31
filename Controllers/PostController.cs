@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using VideoToPostGenerationAPI.Domain.Abstractions;
 using VideoToPostGenerationAPI.Domain.Abstractions.IServices;
 using VideoToPostGenerationAPI.Domain.Entities;
@@ -17,8 +18,8 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
     private readonly IPostService _postService = postService;
     private readonly UserManager<User> _userManager = userManager;
 
-    [HttpGet("{videoId:int}/{platform}")]
-    public async Task<IActionResult> GetPosts([FromRoute] int videoId, [FromRoute] string platform)
+    [HttpGet("{videoId:int}")]
+    public async Task<IActionResult> GetPosts([FromRoute] int videoId, [Required][FromQuery] string platform)
     {
         var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
 
@@ -39,8 +40,8 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
         var post = new Post
         {
             Description = result.Post,
-            AudioId = video.Id,
-            Audio = video,
+            VideoId = video.Id,
+            Video = video,
         };
 
         if (platform.Equals(Platform.Blog.ToString(), StringComparison.CurrentCultureIgnoreCase))
@@ -63,4 +64,19 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
         return Ok(result);
     }
 
+    [HttpGet("old/{videoId:int}")]
+    public async Task<IActionResult> GetOldPosts([FromRoute] int videoId)
+    {
+        var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
+
+        var video = await _unitOfWork.Videos.GetByIdAsync(videoId);
+        if (video is null || video.UserId != loggedinUser!.Id)
+            return BadRequest();
+
+        var posts = await _unitOfWork.Posts.GetAllByVideoIdAsync(video.Id);
+
+        var result = posts.Select(_mapper.Map<ResponsePost>).ToList();
+
+        return Ok(posts);
+    }
 }
