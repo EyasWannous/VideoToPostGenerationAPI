@@ -219,7 +219,7 @@ namespace VideoToPostGenerationAPI.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Platform = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AudioId = table.Column<int>(type: "int", nullable: false),
+                    VideoId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
@@ -227,8 +227,8 @@ namespace VideoToPostGenerationAPI.Migrations
                 {
                     table.PrimaryKey("PK_Posts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Posts_Videos_AudioId",
-                        column: x => x.AudioId,
+                        name: "FK_Posts_Videos_VideoId",
+                        column: x => x.VideoId,
                         principalTable: "Videos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -325,9 +325,9 @@ namespace VideoToPostGenerationAPI.Migrations
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Posts_AudioId",
+                name: "IX_Posts_VideoId",
                 table: "Posts",
-                column: "AudioId");
+                column: "VideoId");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",

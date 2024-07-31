@@ -12,7 +12,7 @@ using VideoToPostGenerationAPI.Presistence.Data;
 namespace VideoToPostGenerationAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240730172802_Initial")]
+    [Migration("20240731093138_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -265,9 +265,6 @@ namespace VideoToPostGenerationAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AudioId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -282,9 +279,12 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("VideoId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("AudioId");
+                    b.HasIndex("VideoId");
 
                     b.ToTable("Posts", (string)null);
                 });
@@ -494,13 +494,13 @@ namespace VideoToPostGenerationAPI.Migrations
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Post", b =>
                 {
-                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Video", "Audio")
+                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Video", "Video")
                         .WithMany("Posts")
-                        .HasForeignKey("AudioId")
+                        .HasForeignKey("VideoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Audio");
+                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Video", b =>
