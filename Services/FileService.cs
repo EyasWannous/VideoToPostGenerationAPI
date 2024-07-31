@@ -13,12 +13,12 @@ public class FileService(IWebHostEnvironment env) : IFileService
 {
     private readonly IWebHostEnvironment _env = env;
 
-    public async Task<ResponseUploadFile> StoreAsync<TEnum>(IFormFile file, string filePath) where TEnum : struct, Enum
+    public async Task<ResponseUploadFileDTO> StoreAsync<TEnum>(IFormFile file, string filePath) where TEnum : struct, Enum
     {
         var extension = Path.GetExtension(file.FileName);
 
         if (!FileValidator.IsExtensionValid<TEnum>(extension))
-            return new ResponseUploadFile
+            return new ResponseUploadFileDTO
             {
                 IsSuccess = false,
                 Message = $"Extension is not Valid ({string.Join(',', FileValidator.GetValidExtensions<TEnum>())})",
@@ -26,7 +26,7 @@ public class FileService(IWebHostEnvironment env) : IFileService
 
         long size = file.Length;
         if (!FileValidator.IsSizeValid(size))
-            return new ResponseUploadFile
+            return new ResponseUploadFileDTO
             {
                 IsSuccess = false,
                 Message = $"Maximum Size Can be {FileSettings.MaxFileSizeInGB}GB",
@@ -39,7 +39,7 @@ public class FileService(IWebHostEnvironment env) : IFileService
         using FileStream stream = new(handle, FileMode.Create, FileAccess.ReadWrite);
         await file.CopyToAsync(stream);
 
-        return new ResponseUploadFile
+        return new ResponseUploadFileDTO
         {
             IsSuccess = true,
             Link = $"{filePath}{fileName}",

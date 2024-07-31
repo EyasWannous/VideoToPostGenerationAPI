@@ -4,7 +4,7 @@ namespace VideoToPostGenerationAPI.Domain.Abstractions.IServices;
 
 public interface IFileService
 {
-    public Task<ResponseUploadFile> StoreAsync<TEnum>(IFormFile file, string filePath) where TEnum : struct, Enum;
+    public Task<ResponseUploadFileDTO> StoreAsync<TEnum>(IFormFile file, string filePath) where TEnum : struct, Enum;
     public Task<byte[]> ReadAsync(string filePath);
     public Task<IFormFile> MakeFileAsync(byte[] fileBytes, string fileName, string contentType);
     public Task CompressAsync(string filePath);

@@ -67,7 +67,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         await _unitOfWork.CompleteAsync();
 
-        result.Video = _mapper.Map<ResponseVideo>(video);
+        result.Video = _mapper.Map<ResponseVideoDTO>(video);
 
         return Ok(result);
     }
@@ -132,9 +132,9 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         return Ok
         (
-            new ResponseUploadFile
+            new ResponseUploadFileDTO
             {
-                Video = _mapper.Map<ResponseVideo>(video),
+                Video = _mapper.Map<ResponseVideoDTO>(video),
                 Link = videoLink,
                 IsSuccess = true,
                 Message = "Video Download Successfully",
@@ -149,7 +149,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         var videos = await _unitOfWork.Videos.GetAllByUserIdAsync(loggedinUser!.Id);
 
-        var mappedVideos = videos.Select(_mapper.Map<ResponseVideo>).ToList();
+        var mappedVideos = videos.Select(_mapper.Map<ResponseVideoDTO>).ToList();
 
         return Ok(mappedVideos);
     }
@@ -164,7 +164,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         if (video is null || video.User.Id != loggedinUser!.Id)
             return BadRequest();
 
-        var mappedVideo = _mapper.Map<ResponseVideo>(video);
+        var mappedVideo = _mapper.Map<ResponseVideoDTO>(video);
         if (mappedVideo is null)
             return BadRequest();
 

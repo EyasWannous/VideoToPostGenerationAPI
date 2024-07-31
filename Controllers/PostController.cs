@@ -33,13 +33,13 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
             Script = video.Transcript,
         };
 
-        var result = await _postService.GetPostAsync(postReqiest, platform);
-        if (result is null)
+        var postResponse = await _postService.GetPostAsync(postReqiest, platform);
+        if (postResponse is null)
             return StatusCode(500, "Internal Server Error");
 
         var post = new Post
         {
-            Description = result.Post,
+            Description = postResponse.Post,
             VideoId = video.Id,
             Video = video,
         };
@@ -48,7 +48,7 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
         {
             var header = new Header
             {
-                Title = result.Title,
+                Title = postResponse.Title,
                 Post = post,
                 PostId = post.Id
             };
@@ -56,12 +56,11 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
             post.Header = header;
         }
 
-
         video.Posts.Add(post);
 
         await _unitOfWork.CompleteAsync();
 
-        return Ok(result);
+        return Ok(_mapper.Map<ResponsePostDTO>(post));
     }
 
     [HttpGet("old/{videoId:int}")]
@@ -75,7 +74,7 @@ public class PostController(IUnitOfWork unitOfWork, IMapper mapper,
 
         var posts = await _unitOfWork.Posts.GetAllByVideoIdAsync(video.Id);
 
-        var result = posts.Select(_mapper.Map<ResponsePost>).ToList();
+        var result = posts.Select(_mapper.Map<ResponsePostDTO>).ToList();
 
         return Ok(posts);
     }

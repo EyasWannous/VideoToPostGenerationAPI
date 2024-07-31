@@ -8,8 +8,8 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<Video, ResponseVideo>();
+        CreateMap<Video, ResponseVideoDTO>();
         
-        CreateMap<Post, ResponsePost>();
+        CreateMap<Post, ResponsePostDTO>();
     }
 }

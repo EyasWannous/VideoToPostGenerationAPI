@@ -2,7 +2,7 @@
 
 namespace VideoToPostGenerationAPI.DTOs.Outgoing;
 
-public record ResponseVideo
+public record ResponseVideoDTO
 {
     public int Id { get; set; }
     public long SizeBytes { get; set; }

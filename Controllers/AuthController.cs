@@ -24,7 +24,7 @@ public class AuthController(IUnitOfWork unitOfWork, IMapper mapper,
         if (!result.IsSuccess)
             return BadRequest
             (
-                new ResponseUserRegister
+                new ResponseUserRegisterDTO
                 {
                     Message = result.Message,
                     IsSuccess = false,
@@ -36,7 +36,7 @@ public class AuthController(IUnitOfWork unitOfWork, IMapper mapper,
 
         return Ok
         (
-            new ResponseUserRegister
+            new ResponseUserRegisterDTO
             {
                 Message = result.Message,
                 IsSuccess = true,
@@ -57,7 +57,7 @@ public class AuthController(IUnitOfWork unitOfWork, IMapper mapper,
         if (!result.IsSuccess)
             return BadRequest
             (
-                new ResponseUserLogin
+                new ResponseUserLoginDTO
                 {
                     Message = result.Message,
                     IsSuccess = false,
@@ -68,7 +68,7 @@ public class AuthController(IUnitOfWork unitOfWork, IMapper mapper,
 
         return Ok
         (
-            new ResponseUserLogin
+            new ResponseUserLoginDTO
             {
                 Message = result.Message,
                 IsSuccess = true,
