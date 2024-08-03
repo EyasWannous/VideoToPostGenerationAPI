@@ -4,50 +4,94 @@ using VideoToPostGenerationAPI.Presistence.Repositories;
 
 namespace VideoToPostGenerationAPI.Presistence.Data;
 
-public class UnitOfWork(AppDbContext context) : IUnitOfWork
+/// <summary>
+/// Unit of Work class that encapsulates the repositories and manages the database context.
+/// </summary>
+public class UnitOfWork : IUnitOfWork, IDisposable
 {
     private bool _disposed = false;
-    private readonly AppDbContext _context = context;
-    public IUserRepository Users { get; } = new UserRepository(context);
+    private readonly AppDbContext _context;
 
-    public IVideoRepository Videos { get; } = new VideoRepository(context);
-    
-    public IAudioRepository Audios { get; }  = new AudioRepository(context);
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UnitOfWork"/> class.
+    /// </summary>
+    /// <param name="context">The database context.</param>
+    public UnitOfWork(AppDbContext context)
+    {
+        _context = context;
+        Users = new UserRepository(_context);
+        Audios = new AudioRepository(_context);
+        Videos = new VideoRepository(_context);
+        Headers = new HeaderRepository(_context);
+        Posts = new PostRepository(_context);
+        Images = new ImageRepository(_context);
+    }
 
-    public IHeaderRepository Headers { get; } = new HeaderRepository(context);
+    /// <summary>
+    /// Gets the user repository.
+    /// </summary>
+    public IUserRepository Users { get; }
 
-    public IPostRepository Posts { get; } = new PostRepository(context);
+    /// <summary>
+    /// Gets the audio repository.
+    /// </summary>
+    public IAudioRepository Audios { get; }
 
-    public IImageRepository Images { get; } = new ImageRepository(context);
+    /// <summary>
+    /// Gets the video repository.
+    /// </summary>
+    public IVideoRepository Videos { get; }
 
+    /// <summary>
+    /// Gets the header repository.
+    /// </summary>
+    public IHeaderRepository Headers { get; }
+
+    /// <summary>
+    /// Gets the post repository.
+    /// </summary>
+    public IPostRepository Posts { get; }
+
+    /// <summary>
+    /// Gets the image repository.
+    /// </summary>
+    public IImageRepository Images { get; }
+
+    /// <summary>
+    /// Saves all changes made in this context to the database.
+    /// </summary>
+    /// <returns>The number of state entries written to the database.</returns>
     public async Task<int> CompleteAsync() => await _context.SaveChangesAsync();
 
-    // disposing : true (dispose managed + unmanaged)
-    // disposing : false (dispose unmanaged + large fields)
+    /// <summary>
+    /// Releases the unmanaged resources used by the <see cref="UnitOfWork"/> and optionally releases the managed resources.
+    /// </summary>
+    /// <param name="disposing">A boolean value indicating whether to release both managed and unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed)
             return;
 
-        // Dispose Logic
         if (disposing)
         {
-            //Dispose Managed Resources
             _context.Dispose();
         }
 
         _disposed = true;
     }
 
-    public void Dispose()   
+    /// <summary>
+    /// Releases all resources used by the current instance of the <see cref="UnitOfWork"/> class.
+    /// </summary>
+    public void Dispose()
     {
-        // Disopose is 100% calling
         Dispose(true);
-
-        // notify garbage collector to not call destructor
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Destructor for the <see cref="UnitOfWork"/> class.
+    /// </summary>
     ~UnitOfWork()
     {
         Dispose(false);

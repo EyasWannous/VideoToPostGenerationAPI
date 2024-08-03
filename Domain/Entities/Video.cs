@@ -2,14 +2,23 @@
 
 namespace VideoToPostGenerationAPI.Domain.Entities;
 
+/// <summary>
+/// Represents a video file entity.
+/// </summary>
 public class Video : BaseFile
 {
+    /// <summary>
+    /// Gets or sets the video file extension.
+    /// </summary>
     public string VideoExtension { get; set; } = string.Empty;
-    public int Duration { get; set; }
-    public string Transcript { get; set; } = string.Empty;
-    public string YoutubeLink { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the ID of the associated audio.
+    /// </summary>
+    public int AudioId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the audio associated with this video.
+    /// </summary>
     public Audio Audio { get; set; }
-    public int UserId { get; set; }
-    public User User { get; set; }
-    public List<Post> Posts { get; set; } = [];
 }

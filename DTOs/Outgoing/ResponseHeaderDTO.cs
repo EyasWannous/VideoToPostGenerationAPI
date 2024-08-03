@@ -1,9 +1,9 @@
-﻿namespace VideoToPostGenerationAPI.Domain.Entities;
+﻿namespace VideoToPostGenerationAPI.DTOs.Outgoing;
 
 /// <summary>
-/// Represents a header entity associated with a post.
+/// Represents the data transfer object for header response data.
 /// </summary>
-public class Header : BaseEntity
+public record ResponseHeaderDTO
 {
     /// <summary>
     /// Gets or sets the title of the header.
@@ -14,9 +14,4 @@ public class Header : BaseEntity
     /// Gets or sets the ID of the associated post.
     /// </summary>
     public int PostId { get; set; }
-
-    /// <summary>
-    /// Gets or sets the post associated with this header.
-    /// </summary>
-    public Post Post { get; set; }
 }

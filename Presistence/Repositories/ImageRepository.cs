@@ -4,6 +4,16 @@ using VideoToPostGenerationAPI.Presistence.Data;
 
 namespace VideoToPostGenerationAPI.Presistence.Repositories;
 
-public class ImageRepository(AppDbContext context) : BaseRepository<Image>(context), IImageRepository
+/// <summary>
+/// Repository for handling operations related to <see cref="Image"/> entities.
+/// </summary>
+public class ImageRepository : BaseRepository<Image>, IImageRepository
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImageRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context.</param>
+    public ImageRepository(AppDbContext context) : base(context)
+    {
+    }
 }

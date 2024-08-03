@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 using VideoToPostGenerationAPI.Domain.Abstractions;
 using VideoToPostGenerationAPI.Domain.Abstractions.IServices;
@@ -22,6 +23,7 @@ builder.Services.AddRouting(configureOptions =>
 {
     configureOptions.LowercaseUrls = true;
 });
+
 
 // Add automapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -73,7 +75,25 @@ builder.Services.AddSwaggerGen(option =>
             }
         }
     );
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    option.IncludeXmlComments(xmlPath);
 });
+
+
+//// Add the detail information for the API.
+//builder.Services.ConfigureSwaggerGen(options =>
+//{
+//    // Determine base path for the application.
+//    var basePath = _env.WebRootPath;
+
+//    // Complete path
+//    var xmlPath = Path.Combine(basePath, "myapi.xml");
+
+//    // Set the comments path for the swagger json and ui.
+//    options.IncludeXmlComments(xmlPath);
+//});
 
 // DataBase
 builder.Services.AddDbContext<AppDbContext>(
@@ -128,13 +148,12 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+app.UseSwagger();
+app.UseSwaggerUI();
+//}
 
 
 app.UseHttpsRedirection();

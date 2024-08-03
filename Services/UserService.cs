@@ -6,13 +6,35 @@ using VideoToPostGenerationAPI.Services.Helpers;
 
 namespace VideoToPostGenerationAPI.Services;
 
-public class UserService(UserManager<User> userManager, IConfiguration configuration, IEmailService mailService) : IUserService
+/// <summary>
+/// Service for managing user-related operations.
+/// </summary>
+public class UserService : IUserService
 {
-    private readonly UserManager<User> _userManager = userManager;
-    private readonly IConfiguration _configuration = configuration;
-    private readonly IEmailService _mailService = mailService;
+    private readonly UserManager<User> _userManager;
+    private readonly IConfiguration _configuration;
+    private readonly IEmailService _mailService;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserService"/> class.
+    /// </summary>
+    /// <param name="userManager">The UserManager for handling user operations.</param>
+    /// <param name="configuration">Configuration settings for the application.</param>
+    /// <param name="mailService">The service for sending emails.</param>
+    public UserService(UserManager<User> userManager, IConfiguration configuration,
+        IEmailService mailService)
+    {
+        _userManager = userManager;
+        _configuration = configuration;
+        _mailService = mailService;
+    }
 
+    /// <summary>
+    /// Confirms the email for a user.
+    /// </summary>
+    /// <param name="userId">The user ID.</param>
+    /// <param name="token">The email confirmation token.</param>
+    /// <returns>A response indicating the result of the email confirmation.</returns>
     public async Task<UserManagerResponse> ConfirmEmailAsync(string userId, string token)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -25,62 +47,82 @@ public class UserService(UserManager<User> userManager, IConfiguration configura
         if (!result.Succeeded)
             return new UserManagerResponse
             {
-                Message = "Email didn't confirmed.",
+                Message = "Email confirmation failed.",
                 IsSuccess = false,
                 Errors = result.Errors.Select(e => e.Description).ToArray()
             };
 
-        return new UserManagerResponse { Message = "Email Confirmed Successfully!", IsSuccess = true };
+        return new UserManagerResponse { Message = "Email confirmed successfully!", IsSuccess = true };
     }
 
-
+    /// <summary>
+    /// Sends a password reset email to a user.
+    /// </summary>
+    /// <param name="email">The email of the user.</param>
+    /// <returns>A response indicating the result of the password reset email request.</returns>
     public async Task<UserManagerResponse> ForgetPasswordAsync(string email)
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user is null)
-            return new UserManagerResponse { Message = "No user associated with this Email.", IsSuccess = false };
+            return new UserManagerResponse { Message = "No user associated with this email.", IsSuccess = false };
 
         _ = Task.Run(() => SendResetPasswordEmail(user));
 
-        return new UserManagerResponse { Message = "Reset Password URL has been sent to the email Successfully!", IsSuccess = true };
+        return new UserManagerResponse { Message = "Reset password URL has been sent to the email successfully!", IsSuccess = true };
     }
 
-
+    /// <summary>
+    /// Logs in a user using their email and password.
+    /// </summary>
+    /// <param name="email">The email of the user.</param>
+    /// <param name="password">The password of the user.</param>
+    /// <returns>A response indicating the result of the login attempt.</returns>
     public async Task<UserManagerResponse> LoginUserUsingEmailAsync(string email, string password)
     {
         var user = await _userManager.FindByEmailAsync(email);
         if (user is null)
-            return new UserManagerResponse { Message = "There is No user with that Email.", IsSuccess = false, User = null };
+            return new UserManagerResponse { Message = "No user found with this email.", IsSuccess = false, User = null };
 
         var result = await _userManager.CheckPasswordAsync(user, password);
         if (!result)
-            return new UserManagerResponse { Message = "Email or Password is not correct.", IsSuccess = false, User = null };
+            return new UserManagerResponse { Message = "Incorrect email or password.", IsSuccess = false, User = null };
 
-        return new UserManagerResponse { Message = "Logged in Successfully!", IsSuccess = true, User = user };
+        return new UserManagerResponse { Message = "Logged in successfully!", IsSuccess = true, User = user };
     }
 
+    // Uncomment if you need to log in using username
+    // /// <summary>
+    // /// Logs in a user using their username and password.
+    // /// </summary>
+    // /// <param name="userName">The username of the user.</param>
+    // /// <param name="password">The password of the user.</param>
+    // /// <returns>A response indicating the result of the login attempt.</returns>
+    // public async Task<UserManagerResponse> LoginUserUsingUserNameAsync(string userName, string password)
+    // {
+    //     var user = await _userManager.FindByNameAsync(userName);
+    //     if (user is null)
+    //         return new UserManagerResponse { Message = "No user found with this username.", IsSuccess = false };
 
-    //public async Task<UserManagerResponse> LoginUserUsingUserNameAsync(string userName, string password)
-    //{
-    //    var user = await _userManager.FindByNameAsync(userName);
-    //    if (user is null)
-    //        return new UserManagerResponse { Message = "There is a user with that UserName.", IsSuccess = false };
+    //     var result = await _userManager.CheckPasswordAsync(user, password);
+    //     if (!result)
+    //         return new UserManagerResponse { Message = "Incorrect username or password.", IsSuccess = false };
 
-    //    var result = await _userManager.CheckPasswordAsync(user, password);
-    //    if (!result)
-    //        return new UserManagerResponse { Message = "UserName or Password is not correct.", IsSuccess = false };
+    //     return new UserManagerResponse { Message = "Logged in successfully!", IsSuccess = true, User = user };
+    // }
 
-    //    return new UserManagerResponse { Message = "Logged in Successfully!", IsSuccess = true, User = user };
-    //}
-
-
+    /// <summary>
+    /// Registers a new user with the specified email and password.
+    /// </summary>
+    /// <param name="email">The email of the user.</param>
+    /// <param name="password">The password of the user.</param>
+    /// <returns>A response indicating the result of the registration attempt.</returns>
     public async Task<UserManagerResponse> RegisterUserAsync(string email, string password)
     {
-        var checkEmail = await _userManager.FindByEmailAsync(email);
-        if (checkEmail is not null)
+        var existingUser = await _userManager.FindByEmailAsync(email);
+        if (existingUser is not null)
             return new UserManagerResponse
             {
-                Message = "Email is already taken, Email must be unique.",
+                Message = "Email is already taken. Email must be unique.",
                 IsSuccess = false,
             };
 
@@ -90,27 +132,27 @@ public class UserService(UserManager<User> userManager, IConfiguration configura
             UserName = email
         };
 
-        // -----------------------------------------------------------------
-        // Don't do this=
-        // var hashedPassword = _passwordHasher.HashPassword(user, password);
-        // var result = await _userManager.CreateAsync(user, hashedPassword);
-        // -----------------------------------------------------------------
-
         var result = await _userManager.CreateAsync(user, password);
         if (!result.Succeeded)
             return new UserManagerResponse
             {
-                Message = "User dosen't created",
+                Message = "User creation failed.",
                 IsSuccess = false,
                 Errors = result.Errors.Select(e => e.Description).ToArray(),
             };
 
         _ = Task.Run(() => SendConfirmRequest(user));
 
-        return new UserManagerResponse { Message = "User created Successfully!", IsSuccess = true, User = user };
+        return new UserManagerResponse { Message = "User created successfully!", IsSuccess = true, User = user };
     }
 
-
+    /// <summary>
+    /// Resets the password for a user.
+    /// </summary>
+    /// <param name="email">The email of the user.</param>
+    /// <param name="token">The password reset token.</param>
+    /// <param name="newPassword">The new password for the user.</param>
+    /// <returns>A response indicating the result of the password reset attempt.</returns>
     public async Task<UserManagerResponse> ResetPasswordAsync(string email, string token, string newPassword)
     {
         var user = await _userManager.FindByEmailAsync(email);
@@ -123,15 +165,18 @@ public class UserService(UserManager<User> userManager, IConfiguration configura
         if (!result.Succeeded)
             return new UserManagerResponse
             {
-                Message = "Something went wrong.",
+                Message = "Password reset failed.",
                 IsSuccess = false,
                 Errors = result.Errors.Select(e => e.Description).ToArray()
             };
 
-        return new UserManagerResponse { Message = "Password has been reset Successfully!", IsSuccess = true };
+        return new UserManagerResponse { Message = "Password has been reset successfully!", IsSuccess = true };
     }
 
-
+    /// <summary>
+    /// Sends an email confirmation request to the user.
+    /// </summary>
+    /// <param name="user">The user to send the confirmation request to.</param>
     private async Task SendConfirmRequest(User user)
     {
         var confirmEmailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -144,14 +189,17 @@ public class UserService(UserManager<User> userManager, IConfiguration configura
         (
             user.Email!,
             "Confirm your email",
-            "<h1>Welcom to BudgetBlitz</h1>"
+            "<h1>Welcome to BudgetBlitz</h1>"
             + "<p>Please confirm your email by "
             + $"<a href='{url}'>"
-            + "Clicking here</a></p>"
+            + "clicking here</a></p>"
         );
     }
 
-
+    /// <summary>
+    /// Sends a password reset email to the user.
+    /// </summary>
+    /// <param name="user">The user to send the password reset email to.</param>
     private async Task SendResetPasswordEmail(User user)
     {
         var passwordResetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -164,10 +212,10 @@ public class UserService(UserManager<User> userManager, IConfiguration configura
         (
             user.Email!,
             "Reset Password",
-            "<h1>Follow the instructions to reset the password</h1>"
-            + "<p>To reset your password "
+            "<h1>Follow the instructions to reset your password</h1>"
+            + "<p>To reset your password, "
             + $"<a href='{url}'>"
-            + "Clicking here</a></p>"
+            + "click here</a></p>"
         );
     }
 }

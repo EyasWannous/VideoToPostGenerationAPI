@@ -5,12 +5,31 @@ using VideoToPostGenerationAPI.Presistence.Data;
 
 namespace VideoToPostGenerationAPI.Presistence.Repositories;
 
-public class PostRepository(AppDbContext context) : BaseRepository<Post>(context), IPostRepository
+/// <summary>
+/// Repository for handling operations related to <see cref="Post"/> entities.
+/// </summary>
+public class PostRepository : BaseRepository<Post>, IPostRepository
 {
-    public async Task<IEnumerable<Post>> GetAllByVideoIdAsync(int videoId)
-        => await _context.Posts
-            .Where(post => post.VideoId == videoId)
-            .Include("Images")
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PostRepository"/> class.
+    /// </summary>
+    /// <param name="context">The database context.</param>
+    public PostRepository(AppDbContext context) : base(context)
+    {
+    }
+
+    /// <summary>
+    /// Retrieves all posts associated with a specific audio ID.
+    /// </summary>
+    /// <param name="audioId">The audio ID to filter posts.</param>
+    /// <returns>A collection of <see cref="Post"/> entities that match the specified audio ID.</returns>
+    public async Task<IEnumerable<Post>> GetAllByAudioIdAsync(int audioId)
+    {
+        return await _context.Posts
+            .Where(post => post.AudioId == audioId)
+            .Include(post => post.Header) // Using lambda expressions for includes
+            .Include(post => post.Images)
             .AsNoTracking()
             .ToListAsync();
+    }
 }

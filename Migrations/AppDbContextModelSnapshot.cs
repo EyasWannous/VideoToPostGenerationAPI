@@ -170,6 +170,9 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Duration")
+                        .HasColumnType("int");
+
                     b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -177,16 +180,23 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Property<long>("SizeBytes")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("Transcript")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("VideoId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
+
+                    b.Property<string>("YoutubeLink")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("VideoId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Audios", (string)null);
                 });
@@ -262,6 +272,9 @@ namespace VideoToPostGenerationAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AudioId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -276,12 +289,9 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("VideoId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("VideoId");
+                    b.HasIndex("AudioId");
 
                     b.ToTable("Posts", (string)null);
                 });
@@ -368,11 +378,11 @@ namespace VideoToPostGenerationAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AudioId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("int");
 
                     b.Property<string>("Link")
                         .IsRequired()
@@ -381,27 +391,17 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Property<long>("SizeBytes")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Transcript")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
 
                     b.Property<string>("VideoExtension")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("YoutubeLink")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("AudioId")
+                        .IsUnique();
 
                     b.ToTable("Videos", (string)null);
                 });
@@ -459,13 +459,13 @@ namespace VideoToPostGenerationAPI.Migrations
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Audio", b =>
                 {
-                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Video", "Video")
-                        .WithOne("Audio")
-                        .HasForeignKey("VideoToPostGenerationAPI.Domain.Entities.Audio", "VideoId")
+                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.User", "User")
+                        .WithMany("Audios")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Video");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Header", b =>
@@ -491,24 +491,30 @@ namespace VideoToPostGenerationAPI.Migrations
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Post", b =>
                 {
-                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Video", "Video")
+                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Audio", "Audio")
                         .WithMany("Posts")
-                        .HasForeignKey("VideoId")
+                        .HasForeignKey("AudioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Video");
+                    b.Navigation("Audio");
                 });
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Video", b =>
                 {
-                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.User", "User")
-                        .WithMany("Audios")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Audio", "Audio")
+                        .WithOne("Video")
+                        .HasForeignKey("VideoToPostGenerationAPI.Domain.Entities.Video", "AudioId")
+                        .OnDelete(DeleteBehavior.Cascade);
 
-                    b.Navigation("User");
+                    b.Navigation("Audio");
+                });
+
+            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Audio", b =>
+                {
+                    b.Navigation("Posts");
+
+                    b.Navigation("Video");
                 });
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Post", b =>
@@ -521,14 +527,6 @@ namespace VideoToPostGenerationAPI.Migrations
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.User", b =>
                 {
                     b.Navigation("Audios");
-                });
-
-            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Video", b =>
-                {
-                    b.Navigation("Audio")
-                        .IsRequired();
-
-                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }
