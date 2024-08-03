@@ -12,7 +12,7 @@ public static class FileSettings
     /// This path is relative to the root of the web application.
     /// Uses forward slashes for compatibility across different operating systems.
     /// </remarks>
-    public const string ImagesPath = "assets/images/";
+    public const string ImagesPath = "assets\\images\\";
 
     /// <summary>
     /// The relative path to the directory where audio files are stored.
@@ -21,7 +21,7 @@ public static class FileSettings
     /// This path is relative to the root of the web application.
     /// Uses forward slashes for compatibility across different operating systems.
     /// </remarks>
-    public const string AudiosPath = "assets/audios/";
+    public const string AudiosPath = "assets\\audios\\";
 
     /// <summary>
     /// The relative path to the directory where video files are stored.
@@ -30,7 +30,7 @@ public static class FileSettings
     /// This path is relative to the root of the web application.
     /// Uses forward slashes for compatibility across different operating systems.
     /// </remarks>
-    public const string VideosPath = "assets/videos/";
+    public const string VideosPath = "assets\\videos\\";
 
     /// <summary>
     /// The maximum allowable file size in gigabytes.

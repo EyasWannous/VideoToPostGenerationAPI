@@ -34,7 +34,7 @@ public class FakeController : BaseController
             SizeBytes = file.Length,
             AudioExtension = ".mp3",
             Transcript = "transcript",
-            Link = "assets/audios/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
+            Link = "assets\\audios\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
             Duration = 2132,
             UserId = 0,
         };
@@ -55,7 +55,7 @@ public class FakeController : BaseController
             SizeBytes = 123,
             AudioExtension = ".mp3",
             Transcript = "transcript",
-            Link = "assets/audios/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
+            Link = "assets\\audios\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
             Duration = 2132,
             UserId = 0,
         };
@@ -63,7 +63,7 @@ public class FakeController : BaseController
         return Ok(new ResponseUploadFileDTO
         {
             Audio = _mapper.Map<ResponseAudioDTO>(audio),
-            Link = "assets/videos/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
+            Link = "assets\\videos\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
             IsSuccess = true,
             Message = "Video Download Successfully",
         });
@@ -81,7 +81,7 @@ public class FakeController : BaseController
             SizeBytes = 123123,
             AudioExtension = ".mp3",
             Transcript = "transcript",
-            Link = "assets/audios/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
+            Link = "assets\\audios\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
             Duration = 2132,
             UserId = 0,
         };
@@ -105,7 +105,7 @@ public class FakeController : BaseController
             SizeBytes = 123123,
             AudioExtension = ".mp3",
             Transcript = "transcript",
-            Link = "assets/audios/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
+            Link = "assets\\audios\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
             Duration = 2132,
             UserId = 0,
         };
@@ -141,7 +141,7 @@ public class FakeController : BaseController
             SizeBytes = 123123,
             AudioExtension = ".mp3",
             Transcript = "transcript",
-            Link = "assets/audios/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
+            Link = "assets\\audios\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
             Duration = 2132,
             UserId = 0,
         };
@@ -149,7 +149,7 @@ public class FakeController : BaseController
         var video = new Video
         {
             SizeBytes = file.Length,
-            Link = "assets/videos/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
+            Link = "assets\\videos\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
             VideoExtension = ".mp4",
             Audio = audio,
             AudioId = audio.Id,
@@ -173,7 +173,7 @@ public class FakeController : BaseController
             SizeBytes = 123123,
             AudioExtension = ".mp3",
             Transcript = "transcript",
-            Link = "assets/audios/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
+            Link = "assets\\audios\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
             Duration = 2132,
             UserId = 0,
         };
@@ -181,7 +181,7 @@ public class FakeController : BaseController
         var video = new Video
         {
             SizeBytes = 231231,
-            Link = "assets/videos/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
+            Link = "assets\\videos\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
             VideoExtension = ".mp4",
             Audio = audio,
             AudioId = audio.Id,
@@ -193,7 +193,7 @@ public class FakeController : BaseController
         {
             Audio = _mapper.Map<ResponseAudioDTO>(audio),
             Video = _mapper.Map<ResponseVideoDTO>(video),
-            Link = "assets/videos/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
+            Link = "assets\\videos\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
             IsSuccess = true,
             Message = "Video Download Successfully",
         });
@@ -211,7 +211,7 @@ public class FakeController : BaseController
             SizeBytes = 123123,
             AudioExtension = ".mp3",
             Transcript = "transcript",
-            Link = "assets/audios/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
+            Link = "assets\\audios\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
             Duration = 2132,
             UserId = 0,
         };
@@ -219,7 +219,7 @@ public class FakeController : BaseController
         var video = new Video
         {
             SizeBytes = 231231,
-            Link = "assets/videos/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
+            Link = "assets\\videos\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
             VideoExtension = ".mp4",
             Audio = audio,
             AudioId = audio.Id,
@@ -244,7 +244,7 @@ public class FakeController : BaseController
             SizeBytes = 123123,
             AudioExtension = ".mp3",
             Transcript = "transcript",
-            Link = "assets/audios/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
+            Link = "assets\\audios\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp3",
             Duration = 2132,
             UserId = 0,
         };
@@ -252,7 +252,7 @@ public class FakeController : BaseController
         var video = new Video
         {
             SizeBytes = 231231,
-            Link = "assets/videos/1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
+            Link = "assets\\videos\\1064335a-e58f-45d8-bc25-edd90ddb5b17.mp4",
             VideoExtension = ".mp4",
             Audio = audio,
             AudioId = audio.Id,
