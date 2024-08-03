@@ -174,7 +174,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         (
             new ResponseUploadFileDTO
             {
-                Audio = _mapper.Map<ResponseAudioDTO>(audio),
+                //Audio = _mapper.Map<ResponseAudioDTO>(audio),
                 Video = _mapper.Map<ResponseVideoDTO>(video),
                 Link = videoLink,
                 IsSuccess = true,
