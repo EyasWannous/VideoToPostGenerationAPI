@@ -28,8 +28,20 @@ public class PostRepository : BaseRepository<Post>, IPostRepository
         return await _context.Posts
             .Where(post => post.AudioId == audioId)
             .Include(post => post.Header) // Using lambda expressions for includes
-            .Include(post => post.Images)
+            .Include(post => post.PostImages)
+            .Include(post => post.PostOptions)
             .AsNoTracking()
             .ToListAsync();
+    }
+
+    public async Task<Post?> GetByPostIdAsync(int postId)
+    {
+        return await _context.Posts
+            .Where(post => post.Id == postId)
+            .Include(post => post.Header)
+            .Include(post => post.PostImages)
+            .Include(post => post.PostOptions)
+            //.AsNoTracking()
+            .FirstOrDefaultAsync();
     }
 }

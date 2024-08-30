@@ -20,4 +20,6 @@ public interface IAudioRepository : IBaseRepository<Audio>
     /// <param name="id">The ID of the audio record to be retrieved.</param>
     /// <returns>A task representing the asynchronous operation. The task result contains the <see cref="Audio"/> entity if found, or <c>null</c> if no record with the specified ID exists.</returns>
     Task<Audio?> GetByIdToDeleteAsync(int id);
+
+    Task<Audio?> GetAudioByIdForPost(int id);
 }

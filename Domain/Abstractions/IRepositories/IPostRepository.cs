@@ -13,4 +13,5 @@ public interface IPostRepository : IBaseRepository<Post>
     /// <param name="audioId">The ID of the audio associated with the posts.</param>
     /// <returns>A collection of <see cref="Post"/> entities associated with the specified audio ID.</returns>
     Task<IEnumerable<Post>> GetAllByAudioIdAsync(int audioId);
+    Task<Post?> GetByPostIdAsync(int postId);
 }

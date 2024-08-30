@@ -26,8 +26,15 @@ public class AudioRepository : BaseRepository<Audio>, IAudioRepository
     public async Task<IEnumerable<Audio>> GetAllByUserIdAsync(int userId)
         => await _context.Audios
             .Where(audio => audio.UserId == userId)
+            .Include(audio => audio.VideoThumbnail)
             .AsNoTracking()
             .ToListAsync();
+
+    public async Task<Audio?> GetAudioByIdForPost(int id)
+        => await _context.Audios
+            .Where(audio => audio.Id == id)
+            .Include(audio => audio.Video)
+            .FirstOrDefaultAsync();
 
     /// <summary>
     /// Retrieves an audio entity by its ID, including related data, for deletion.
@@ -39,6 +46,6 @@ public class AudioRepository : BaseRepository<Audio>, IAudioRepository
             .Where(audio => audio.Id == id)
             .Include(audio => audio.Video)
             .Include(audio => audio.Posts)
-            .ThenInclude(post => post.Images)
+            .ThenInclude(post => post.PostImages)
             .FirstOrDefaultAsync(); // Changed to FirstOrDefaultAsync for better null handling
 }
