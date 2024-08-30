@@ -12,10 +12,11 @@ public class Post : BaseEntity
     /// </summary>
     public string Description { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Gets or sets the platform where the post is shared.
-    /// </summary>
-    public string Platform { get; set; } = string.Empty;
+    ///// <summary>
+    ///// Gets or sets the platform where the post is shared.
+    ///// </summary>
+    //public string Platform { get; set; } = string.Empty;
+    public double Rate { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the associated audio.
@@ -35,5 +36,7 @@ public class Post : BaseEntity
     /// <summary>
     /// Gets or sets the list of images associated with this post.
     /// </summary>
-    public List<Image> Images { get; set; } = new();
+    public List<PostImage> PostImages { get; set; } = [];
+
+    public PostOptions PostOptions { get; set; }
 }
