@@ -1,7 +1,4 @@
-﻿using System.Net.NetworkInformation;
-using VideoToPostGenerationAPI.Domain.Enums;
-
-namespace VideoToPostGenerationAPI.DTOs.Outgoing;
+﻿namespace VideoToPostGenerationAPI.DTOs.Outgoing;
 
 /// <summary>
 /// Represents the data transfer object for audio response data.
@@ -12,6 +9,11 @@ public record ResponseAudioDTO
     /// Gets or sets the unique identifier for the audio.
     /// </summary>
     public int Id { get; set; }
+
+    /// <summary>
+    /// Gets or sets the title of the audio.
+    /// </summary>
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the size of the audio file in bytes.
@@ -37,6 +39,10 @@ public record ResponseAudioDTO
     /// Gets or sets the duration of the audio in seconds.
     /// </summary>
     public int Duration { get; set; }
+
+    public ResponseVideoThumbnailDTO VideoThumbnail { get; set; }
+
+    public bool HasVideo { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the audio was created.

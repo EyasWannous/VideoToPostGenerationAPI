@@ -18,4 +18,10 @@ public record PostResponse
     /// </summary>
     [JsonPropertyName("post")]
     public string Post { get; set; } = string.Empty;
+
+    [JsonPropertyName("rating")]
+    public double Rate {  get; set; }
+ 
+    [JsonPropertyName("images")]
+    public List<string> Images { get; set; } = [];
 }

@@ -17,5 +17,11 @@ public record PostRequest
     /// Gets or sets the link or URL associated with the post.
     /// </summary>
     [JsonPropertyName("link")]
-    public string Link { get; set; } = string.Empty;
+    public string? Link { get; set; }
+
+    [JsonPropertyName("video_file")]
+    public string? VideoLink { get; set; }
+
+    [JsonPropertyName("options")]
+    public required PostOptionsRequest PostOptionsRequest { get; set; }
 }

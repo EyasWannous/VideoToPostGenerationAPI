@@ -13,5 +13,5 @@ public record ResponseHeaderDTO
     /// <summary>
     /// Gets or sets the ID of the associated post.
     /// </summary>
-    public int PostId { get; set; }
+    //public int PostId { get; set; }
 }

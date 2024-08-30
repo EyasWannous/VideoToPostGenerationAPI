@@ -16,11 +16,12 @@ public record ResponsePostDTO
     /// Gets or sets the description of the post.
     /// </summary>
     public string Description { get; set; } = string.Empty;
+    public double Rate { get; set; }
 
     /// <summary>
     /// Gets or sets the platform where the post is shared.
     /// </summary>
-    public string Platform { get; set; } = string.Empty;
+    public ResponsePostOptionsDTO PostOptions { get; set; }
 
     /// <summary>
     /// Gets or sets the header information associated with the post.
@@ -28,6 +29,7 @@ public record ResponsePostDTO
     /// </summary>
     public ResponseHeaderDTO? Header { get; set; }
 
+    public List<ResponsePostImageDTO> PostImages { get; set; } = [];
     /// <summary>
     /// Gets or sets the date and time when the post was created.
     /// </summary>
