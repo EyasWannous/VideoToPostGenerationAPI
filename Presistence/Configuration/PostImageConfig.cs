@@ -5,33 +5,33 @@ using VideoToPostGenerationAPI.Domain.Entities;
 namespace VideoToPostGenerationAPI.Presistence.Configuration;
 
 /// <summary>
-/// Configures the entity type <see cref="Image"/> for Entity Framework.
+/// Configures the entity type <see cref="PostImage"/> for Entity Framework.
 /// </summary>
-public class ImageConfig : IEntityTypeConfiguration<Image>
+public class PostImageConfig : IEntityTypeConfiguration<PostImage>
 {
     /// <summary>
-    /// Configures the <see cref="Image"/> entity with the specified <see cref="EntityTypeBuilder{Image}"/>.
+    /// Configures the <see cref="PostImage"/> entity with the specified <see cref="EntityTypeBuilder{Image}"/>.
     /// </summary>
     /// <param name="builder">The builder used to configure the entity.</param>
-    public void Configure(EntityTypeBuilder<Image> builder)
+    public void Configure(EntityTypeBuilder<PostImage> builder)
     {
         // Define the primary key for the Image entity
-        builder.HasKey(image => image.Id);
+        builder.HasKey(postImage => postImage.Id);
 
         // Define properties with required constraints
-        builder.Property(image => image.SizeBytes)
+        builder.Property(postImage => postImage.SizeBytes)
             .IsRequired();
 
-        builder.Property(image => image.Link)
+        builder.Property(postImage => postImage.Link)
             .IsRequired();
 
-        builder.Property(image => image.ImageExtension)
+        builder.Property(postImage => postImage.ImageExtension)
             .IsRequired();
 
-        builder.Property(image => image.PostId)
+        builder.Property(postImage => postImage.PostId)
             .IsRequired();
 
         // Specify the table name for the Image entity
-        builder.ToTable("Images");
+        builder.ToTable("PostImages");
     }
 }
