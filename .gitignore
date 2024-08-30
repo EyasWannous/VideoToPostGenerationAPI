@@ -368,3 +368,6 @@ ffprobe.exe
 
 # assets
 wwwroot/assets
+
+# yt-dlp
+wwwroot/yt-dlp.exe
