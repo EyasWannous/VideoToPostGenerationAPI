@@ -17,23 +17,16 @@ namespace VideoToPostGenerationAPI.Services;
 public class TokenService : ITokenService
 {
     private readonly JwtOptions _options;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly UserManager<User> _userManager;
     private readonly TokenValidationParameters _tokenValidationParameters;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TokenService"/> class.
     /// </summary>
     /// <param name="options">Options for JWT configuration.</param>
-    /// <param name="unitOfWork">Unit of work for database operations.</param>
-    /// <param name="userManager">User manager for user-related operations.</param>
     /// <param name="tokenValidationParameters">Parameters for validating JWT tokens.</param>
-    public TokenService(IOptionsMonitor<JwtOptions> options, IUnitOfWork unitOfWork,
-        UserManager<User> userManager, TokenValidationParameters tokenValidationParameters)
+    public TokenService(IOptionsMonitor<JwtOptions> options, TokenValidationParameters tokenValidationParameters)
     {
         _options = options.CurrentValue;
-        _unitOfWork = unitOfWork;
-        _userManager = userManager;
         _tokenValidationParameters = tokenValidationParameters;
     }
 

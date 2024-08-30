@@ -89,4 +89,14 @@ public interface IFileService
     /// <param name="filePath">The path to the file to be deleted.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
     Task DeleteFileAsync(string filePath);
+    
+    /// <summary>
+    /// Asynchronously retrieves all file paths from the specified folder.
+    /// </summary>
+    /// <param name="folderPath">The relative path to the folder from which to retrieve files.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a list of file paths.</returns>
+    /// <exception cref="DirectoryNotFoundException">Thrown if the specified folder path does not exist.</exception>
+    /// <exception cref="IOException">Thrown if an I/O error occurs while accessing the file system.</exception>
+    Task<List<string>> GetAllFilesAsync(string folderPath);
+    Task<string> DownloadImageAsync(string url);
 }

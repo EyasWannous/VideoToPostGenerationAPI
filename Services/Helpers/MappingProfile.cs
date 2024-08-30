@@ -30,5 +30,15 @@ public class MappingProfile : Profile
         // Map Header entity to ResponseHeaderDTO
         CreateMap<Header, ResponseHeaderDTO>()
             .ReverseMap(); // Optional: If you want to map from DTO back to entity
+
+        CreateMap<VideoThumbnail, ResponseVideoThumbnailDTO>()
+            .ReverseMap();
+
+        CreateMap<PostOptions, ResponsePostOptionsDTO>()
+            .ReverseMap();
+
+        CreateMap<PostImage, ResponsePostImageDTO>()
+            .ReverseMap();
     }
+    
 }

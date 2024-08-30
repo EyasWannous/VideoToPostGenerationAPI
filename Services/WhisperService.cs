@@ -26,7 +26,7 @@ public class WhisperService : IWhisperService, IDisposable
         _client = client;
         _client.BaseAddress = new Uri(WhisperURL);
         _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-        _client.Timeout = TimeSpan.FromSeconds(300);
+        _client.Timeout = TimeSpan.FromMinutes(30);
     }
 
     /// <summary>

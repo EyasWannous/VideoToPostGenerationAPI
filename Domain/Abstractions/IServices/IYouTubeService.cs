@@ -19,4 +19,6 @@ public interface IYouTubeService
     ///     var captions = await youTubeService.GetVideoCaptions("https://www.youtube.com/watch?v=example", "en");
     /// </remarks>
     Task<string?> GetVideoCaptions(string videoURL, string languagePrefix);
+    Task<string?> GetVideoThumbnailUrlAsync(string videoURL);
+    Task<string> GetVideoTitleAsync(string videoURL);
 }

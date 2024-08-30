@@ -13,9 +13,10 @@ public class YouTubeService : IYouTubeService
     /// <summary>
     /// Initializes a new instance of the <see cref="YouTubeService"/> class.
     /// </summary>
-    public YouTubeService()
+    public YouTubeService(HttpClient client)
     {
-        _youtubeClient = new YoutubeClient();
+        client.Timeout = TimeSpan.FromMinutes(30);
+        _youtubeClient = new YoutubeClient(http: client);
     }
 
     /// <summary>
@@ -52,6 +53,46 @@ public class YouTubeService : IYouTubeService
             // Log the exception or handle it as needed
             // For example: _logger.LogError(ex, "An error occurred while retrieving YouTube captions.");
             throw new ApplicationException("An error occurred while retrieving video captions.", ex);
+        }
+    }
+
+    /// <summary>
+    /// Retrieves the title of a YouTube video.
+    /// </summary>
+    /// <param name="videoURL">The URL of the YouTube video.</param>
+    /// <returns>The title of the video as a string.</returns>
+    public async Task<string> GetVideoTitleAsync(string videoURL)
+    {
+        try
+        {
+            var video = await _youtubeClient.Videos.GetAsync(videoURL);
+            return video.Title;
+        }
+        catch (Exception ex)
+        {
+            // Log the exception or handle it as needed
+            throw new ApplicationException("An error occurred while retrieving the video title.", ex);
+        }
+    }
+
+    /// <summary>
+    /// Retrieves the thumbnail URL of a YouTube video.
+    /// </summary>
+    /// <param name="videoURL">The URL of the YouTube video.</param>
+    /// <returns>The URL of the video thumbnail.</returns>
+    public async Task<string?> GetVideoThumbnailUrlAsync(string videoURL)
+    {
+        try
+        {
+            var video = await _youtubeClient.Videos.GetAsync(videoURL);
+            var thumbnailUrl = video.Thumbnails.MaxBy(t => t.Resolution.Width)?.Url;
+            return thumbnailUrl;
+        }
+        catch (Exception ex)
+        {
+            return null;
+            // Log the exception or handle it as needed
+            //throw new ApplicationException("An error occurred while retrieving the video thumbnail.", ex);
         }
     }
 }
