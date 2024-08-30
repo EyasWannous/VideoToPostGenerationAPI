@@ -8,7 +8,7 @@ public enum Platform
     /// <summary>
     /// A platform for personal and professional blogs.
     /// </summary>
-    Blog,
+    Blog = 1,
 
     /// <summary>
     /// A professional networking platform focused on business and career development.

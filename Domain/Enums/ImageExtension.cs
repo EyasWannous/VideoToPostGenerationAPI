@@ -5,6 +5,7 @@
 /// </summary>
 public enum ImageExtension
 {
+    None,
     /// <summary>
     /// Animated Portable Network Graphics format.
     /// </summary>
