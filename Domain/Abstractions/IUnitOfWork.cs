@@ -35,7 +35,11 @@ public interface IUnitOfWork : IDisposable
     /// <summary>
     /// Gets the repository for image-related operations.
     /// </summary>
-    IImageRepository Images { get; }
+    IPostImageRepository PostsImages { get; }
+
+    IPostOptionsRepository PostsOptions { get; }
+
+    IVideoThumbnailRepository VideoThumbnails { get; }
 
     /// <summary>
     /// Saves all changes made in this context to the database.

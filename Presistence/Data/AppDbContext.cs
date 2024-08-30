@@ -37,12 +37,16 @@ public class AppDbContext : IdentityDbContext<User, IdentityRole<int>, int>
     /// <summary>
     /// Gets or sets the <see cref="DbSet{Image}"/> representing the Images in the database.
     /// </summary>
-    public DbSet<Image> Images { get; set; }
+    public DbSet<PostImage> Images { get; set; }
 
     /// <summary>
     /// Gets or sets the <see cref="DbSet{Header}"/> representing the Headers in the database.
     /// </summary>
     public DbSet<Header> Headers { get; set; }
+
+    public DbSet<PostOptions> PostOptions { get; set; }
+
+    public DbSet<VideoThumbnail> Thumbnails { get; set; }
 
     /// <summary>
     /// Configures the model creating process for the context.

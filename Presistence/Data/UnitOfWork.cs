@@ -24,7 +24,9 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         Videos = new VideoRepository(_context);
         Headers = new HeaderRepository(_context);
         Posts = new PostRepository(_context);
-        Images = new ImageRepository(_context);
+        PostsImages = new PostImageRepository(_context);
+        PostsOptions = new PostOptionsRepository(_context);
+        VideoThumbnails = new VideoThumbnailRepository(_context);
     }
 
     /// <summary>
@@ -55,7 +57,12 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     /// <summary>
     /// Gets the image repository.
     /// </summary>
-    public IImageRepository Images { get; }
+    public IPostImageRepository PostsImages { get; }
+
+    public IPostOptionsRepository PostsOptions { get; }
+
+    public IVideoThumbnailRepository VideoThumbnails { get; }
+
 
     /// <summary>
     /// Saves all changes made in this context to the database.
