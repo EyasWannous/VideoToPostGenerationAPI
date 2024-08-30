@@ -1,15 +1,21 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
+using System.Net.WebSockets;
 using System.Reflection;
 using System.Text;
+using VideoToPostGenerationAPI;
 using VideoToPostGenerationAPI.Domain.Abstractions;
 using VideoToPostGenerationAPI.Domain.Abstractions.IServices;
 using VideoToPostGenerationAPI.Domain.Entities;
 using VideoToPostGenerationAPI.Domain.Settings;
 using VideoToPostGenerationAPI.Presistence.Data;
+using VideoToPostGenerationAPI.Presistence.Hubs;
 using VideoToPostGenerationAPI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,10 +40,50 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IFileService, FileService>();
 
+// External Http APIS
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<IPostService, PostService>();
+
+//builder.WebHost.ConfigureKestrel(serverOptions =>
+//{
+//    serverOptions.Limits.MaxRequestBodySize = FileSettings.MaxFileSizeInBytes; // Increase max request body size (500 MB)
+//    serverOptions.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(30); // Increase Keep-Alive timeout
+//    serverOptions.Limits.RequestHeadersTimeout = TimeSpan.FromMinutes(30); // Increase request headers timeout
+//});
+
+
+builder.Services.AddScoped<IGenerationService, GenerationService>();
 builder.Services.AddScoped<IWhisperService, WhisperService>();
 builder.Services.AddScoped<IYouTubeService, YouTubeService>();
+
+
+// WebSocket
+builder.Services.AddSignalR();
+builder.Services.AddTransient<ClientWebSocket>();
+
+builder.Services.AddWebSockets(configure =>
+{
+    configure.KeepAliveInterval = TimeSpan.FromMinutes(5);
+    configure.AllowedOrigins.Add("ws://192.168.1.9:8000/api/");
+});
+builder.Services.AddScoped<IWebSocketClientService, WebSocketClientService>(provider =>
+{
+    var client = provider.GetRequiredService<ClientWebSocket>();
+    return new WebSocketClientService(client);
+});
+
+//// Enable CORS for all origins, all headers, and all methods
+builder.Services.AddCorsDevelopmentPolicy();
+
+// Task Scheduling
+//builder.Services.AddQuartz(options => { });
+
+//builder.Services.AddQuartzHostedService(options =>
+//{
+//    options.WaitForJobsToComplete = true;
+//});
+
+//builder.Services.ConfigureOptions<LoggingBackgroundJobSetup>();
+//builder.Services.ConfigureOptions<DeletingFilesBackgroundJobSetup>();
 
 // Swagger Authorization
 builder.Services.AddSwaggerGen(option =>
@@ -78,22 +124,8 @@ builder.Services.AddSwaggerGen(option =>
 
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    option.IncludeXmlComments(xmlPath);
+    //option.IncludeXmlComments(xmlPath);
 });
-
-
-//// Add the detail information for the API.
-//builder.Services.ConfigureSwaggerGen(options =>
-//{
-//    // Determine base path for the application.
-//    var basePath = _env.WebRootPath;
-
-//    // Complete path
-//    var xmlPath = Path.Combine(basePath, "myapi.xml");
-
-//    // Set the comments path for the swagger json and ui.
-//    options.IncludeXmlComments(xmlPath);
-//});
 
 // DataBase
 builder.Services.AddDbContext<AppDbContext>(
@@ -145,11 +177,19 @@ builder.Services.AddAuthentication(options =>
 
 });
 
+// Request Body Limit
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = FileSettings.MaxFileSizeInBytes;
+});
 
 var app = builder.Build();
 
+app.UseCors("Ahmad");
+
+
 // Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())  
 //{
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -158,26 +198,14 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-//// Build the different providers you need
-//var webRootProvider = new PhysicalFileProvider(builder.Environment.WebRootPath);
-
-//var newPathProvider = new PhysicalFileProvider(Path.Combine(builder.Environment.ContentRootPath, @"Other"));
-
-//// Create the Composite Provider
-//var compositeProvider = new CompositeFileProvider(webRootProvider, newPathProvider);
-
-//// Replace the default provider with the new one
-//app.Environment.WebRootFileProvider = compositeProvider;
-
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    // Add the other folder, using the Content Root as the base
-//    FileProvider = new PhysicalFileProvider(
-//    Path.Combine(builder.Environment.ContentRootPath, "OtherFolder"))
-//});
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseWebSockets();
+
+app.MapHub<PostHub>("post-hub");
+
 
 app.Run();
