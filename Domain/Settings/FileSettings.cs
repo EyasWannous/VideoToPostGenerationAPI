@@ -47,7 +47,7 @@ public static class FileSettings
     /// This value is calculated from <see cref="MaxFileSizeInGB"/> by converting gigabytes to bytes.
     /// The calculation uses a long literal to ensure the value fits within a long data type.
     /// </remarks>
-    public const long MaxFileSizeInBytes = MaxFileSizeInGB * 1024L * 1024 * 1024;
+    public const long MaxFileSizeInBytes = MaxFileSizeInGB * 1024L * 1024L * 1024L;
 
     ///// <summary>
     ///// The allowed file extensions for uploads.
