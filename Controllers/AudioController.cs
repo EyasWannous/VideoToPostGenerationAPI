@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using AngleSharp.Html.Dom;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -18,11 +19,13 @@ namespace VideoToPostGenerationAPI.Controllers;
 [Authorize]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService,
-    IWhisperService whisperService, IYouTubeService youTubeService, UserManager<User> userManager) : BaseController(unitOfWork, mapper)
+    IWhisperService whisperService, IYouTubeService youTubeService,
+    IGenerationService generationService, UserManager<User> userManager) : BaseController(unitOfWork, mapper)
 {
     private readonly IFileService _fileService = fileService;
     private readonly IWhisperService _whisperService = whisperService;
     private readonly IYouTubeService _youTubeService = youTubeService;
+    private readonly IGenerationService _generationService = generationService;
     private readonly UserManager<User> _userManager = userManager;
 
     /// <summary>
@@ -42,6 +45,8 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
     [HttpPost("upload")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [RequestSizeLimit(FileSettings.MaxFileSizeInBytes)]
+    //[AllowedExtensions()]
     public async Task<IActionResult> Upload(IFormFile file)
     {
         var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
@@ -53,15 +58,26 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         var extension = Path.GetExtension(result.Link);
         var duration = await _fileService.GetDurationAsync(result.Link);
 
-        var audioTranscript = await _whisperService.GetTranscriptAsync(result.Link);
-        if (audioTranscript is null)
+        var transcript = await _whisperService.GetTranscriptAsync(result.Link);
+        if (transcript is null)
             return BadRequest("Could not get transcript, please try again");
+
+        var titleRequest = new TitleRequest
+        {
+            Script = transcript.Text,
+        };
+
+        var title = await _generationService.GetTitleAsync(titleRequest);
+        if (title is null)
+            return BadRequest("Could not make title for this file, please try again");
+
 
         var audio = new Audio
         {
+            Title = title.Title,
             SizeBytes = file.Length,
             AudioExtension = extension.Split('.').Last() ?? AudioExtension.None.ToString(),
-            Transcript = audioTranscript.Text,
+            Transcript = transcript.Text,
             Link = result.Link,
             Duration = duration,
             UserId = loggedinUser!.Id,
@@ -99,6 +115,9 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         if (filePath is null)
             return BadRequest("Could not download audio file, please check the link or try again");
 
+        if (filePath.Contains("error"))
+            return BadRequest(filePath);
+
         var audioLink = $"{FileSettings.AudiosPath}{filePath}";
 
         var extension = Path.GetExtension(audioLink);
@@ -113,10 +132,15 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         }
 
         if (transcript is null)
-            return BadRequest();
+            return BadRequest("Could not get transcript from youtube, please try again");
+
+        var title = await _youTubeService.GetVideoTitleAsync(link);
+        if(title is null)
+            return BadRequest("Could not make title for this file, please try again");
 
         var audio = new Audio
         {
+            Title = title,
             SizeBytes = await _fileService.GetFileSizeAsync(audioLink),
             AudioExtension = extension.Split('.').Last() ?? AudioExtension.None.ToString(),
             Transcript = transcript,
@@ -185,13 +209,9 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         var audio = await _unitOfWork.Audios.GetByIdAsync(id);
         if (audio is null || audio.User.Id != loggedinUser!.Id)
-            return BadRequest();
+            return StatusCode(500, "Internal Server Error, User must be logged in");
 
-        var mappedAudio = _mapper.Map<ResponseAudioDTO>(audio);
-        if (mappedAudio is null)
-            return BadRequest();
-
-        return Ok(mappedAudio);
+        return Ok(_mapper.Map<ResponseAudioDTO>(audio));
     }
 
     /// <summary>
@@ -214,7 +234,7 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         var audio = await _unitOfWork.Audios.GetByIdToDeleteAsync(id);
         if (audio is null || audio.User.Id != loggedinUser!.Id)
-            return BadRequest();
+            return StatusCode(500, "Internal Server Error, User must be logged in");
 
         var tasks = new List<Task>
         {

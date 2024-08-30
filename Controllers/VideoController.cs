@@ -19,11 +19,13 @@ namespace VideoToPostGenerationAPI.Controllers;
 [Authorize]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService,
-    IWhisperService whisperService, IYouTubeService youTubeService, UserManager<User> userManager) : BaseController(unitOfWork, mapper)
+    IWhisperService whisperService, IYouTubeService youTubeService,
+    IGenerationService generationService, UserManager<User> userManager) : BaseController(unitOfWork, mapper)
 {
     private readonly IFileService _fileService = fileService;
     private readonly IWhisperService _whisperService = whisperService;
     private readonly IYouTubeService _youTubeService = youTubeService;
+    private readonly IGenerationService _generationService = generationService;
     private readonly UserManager<User> _userManager = userManager;
 
     /// <summary>
@@ -45,6 +47,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
     [HttpPost("upload")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [RequestSizeLimit(FileSettings.MaxFileSizeInBytes)]
     public async Task<IActionResult> Upload([Required] IFormFile file)
     {
         var loggedinUser = await _userManager.GetUserAsync(HttpContext.User);
@@ -62,10 +65,20 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         var transcript = await _whisperService.GetTranscriptAsync(audioLink);
         if (transcript is null)
-            return BadRequest();
+            return BadRequest("Could not make transcript from the audio, please try again");
+
+        var titleRequest = new TitleRequest
+        {
+            Script = transcript.Text,
+        };
+
+        var title = await _generationService.GetTitleAsync(titleRequest);
+        if (title is null)
+            return BadRequest("Could not make title for this file, please try again");
 
         var audio = new Audio
         {
+            Title = title.Title,
             SizeBytes = await _fileService.GetFileSizeAsync(audioLink),
             AudioExtension = audioExtension.Split('.').Last() ?? AudioExtension.None.ToString(),
             Transcript = transcript.Text,
@@ -85,6 +98,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         };
 
         audio.Video = video;
+        audio.HasVideo = true;
 
         await _unitOfWork.Videos.AddAsync(video);
         await _unitOfWork.Audios.AddAsync(audio);
@@ -95,7 +109,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         //return Ok(result);
 
-        return CreatedAtAction(nameof(GetVideoById), new { id = video.Id }, _mapper.Map<ResponseVideoDTO>(video));
+        return CreatedAtAction(nameof(GetVideoById), new { id = video.Id }, _mapper.Map<ResponseAudioDTO>(audio));
     }
 
     /// <summary>
@@ -120,7 +134,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         var filePath = await _fileService.DownloadFileAsync(FileSettings.VideosPath, link, false);
         if (filePath is null)
-            return BadRequest();
+            return BadRequest("Could not donwload youtube video, please try again");
 
         var videoLink = $"{FileSettings.VideosPath}{filePath}";
 
@@ -140,10 +154,26 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         }
 
         if (transcript is null)
-            return BadRequest();
+            return BadRequest("Could not make transcript from the audio, please try again");
+
+        var title = await _youTubeService.GetVideoTitleAsync(link);
+        if(title is null)
+        {
+            var titleRequest = new TitleRequest
+            {
+                Script = transcript,
+            };
+
+            var response = await _generationService.GetTitleAsync(titleRequest);
+            title = response?.Title;
+        }
+
+        if (title is null)
+            return BadRequest("Could not make title for this file, please try again");
 
         var audio = new Audio
         {
+            Title = title,
             SizeBytes = await _fileService.GetFileSizeAsync(audioLink),
             AudioExtension = audioExtension.Split('.').Last() ?? AudioExtension.None.ToString(),
             Transcript = transcript,
@@ -151,8 +181,23 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
             Link = audioLink,
             Duration = duration,
             UserId = loggedinUser!.Id,
-            User = loggedinUser
+            User = loggedinUser,
+            HasVideo = true,
         };
+
+        var thumbnailUrl = await _youTubeService.GetVideoThumbnailUrlAsync(link);
+        if(thumbnailUrl is not null)
+        {
+            var audioThumbnail = new VideoThumbnail
+            {
+                Audio = audio,
+                Link = thumbnailUrl,
+                AudioId = audio.Id,
+            };
+
+            audio.VideoThumbnail = audioThumbnail;
+            await _unitOfWork.VideoThumbnails.AddAsync(audioThumbnail);
+        }
 
         var video = new Video
         {
@@ -160,10 +205,11 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
             Link = videoLink,
             VideoExtension = videoExtension.Split('.').Last() ?? VideoExtension.None.ToString(),
             Audio = audio,
-            AudioId = audio.Id,
+            AudioId = audio.Id
         };
 
         audio.Video = video;
+        audio.HasVideo = true;
 
         await _unitOfWork.Audios.AddAsync(audio);
         await _unitOfWork.Videos.AddAsync(video);
@@ -174,8 +220,8 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         (
             new ResponseUploadFileDTO
             {
-                //Audio = _mapper.Map<ResponseAudioDTO>(audio),
-                Video = _mapper.Map<ResponseVideoDTO>(video),
+                Audio = _mapper.Map<ResponseAudioDTO>(audio),
+                //Video = _mapper.Map<ResponseVideoDTO>(video),
                 Link = videoLink,
                 IsSuccess = true,
                 Message = "Video Download Successfully",
@@ -223,13 +269,9 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         var video = await _unitOfWork.Videos.GetByIdAsync(id);
         if (video is null || video.Audio.User.Id != loggedinUser!.Id)
-            return BadRequest();
+            return BadRequest("User Don't have access to this video");
 
-        var mappedVideo = _mapper.Map<ResponseVideoDTO>(video);
-        if (mappedVideo is null)
-            return BadRequest();
-
-        return Ok(mappedVideo);
+        return Ok(_mapper.Map<ResponseVideoDTO>(video));
     }
 
     /// <summary>
@@ -254,7 +296,7 @@ public class VideoController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
 
         var video = await _unitOfWork.Videos.GetByIdAsync(id);
         if (video is null || video.Audio.User.Id != loggedinUser!.Id)
-            return BadRequest();
+            return StatusCode(500, "Internal Server Error, User must be logged in");
 
         var tasks = new List<Task>
         {

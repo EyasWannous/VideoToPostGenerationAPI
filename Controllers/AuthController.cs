@@ -1,8 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
-using System.IdentityModel.Tokens.Jwt;
 using VideoToPostGenerationAPI.Domain.Abstractions;
 using VideoToPostGenerationAPI.Domain.Abstractions.IServices;
 using VideoToPostGenerationAPI.DTOs.Incoming;
@@ -40,6 +37,17 @@ public class AuthController(IUnitOfWork unitOfWork, IMapper mapper,
     [HttpPost("register")]
     public async Task<IActionResult> Register(RequestRegisterDTO request)
     {
+        if (!request.Password.Equals(request.ConfirmPassword))
+            return BadRequest
+            (
+                new ResponseUserRegisterDTO
+                {
+                    Message = "Password is not same as confirm password",
+                    IsSuccess = false,
+                    Errors = [],
+                }
+            );
+
         var result = await _userService.RegisterUserAsync(
             request.Email,
             request.Password
