@@ -5,12 +5,12 @@ namespace VideoToPostGenerationAPI.Domain.Entities;
 /// <summary>
 /// Represents an image file entity.
 /// </summary>
-public class Image : BaseFile
+public class PostImage : BaseFile
 {
     /// <summary>
     /// Gets or sets the image file extension.
     /// </summary>
-    public ImageExtension ImageExtension { get; set; }
+    public string ImageExtension { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the ID of the associated post.
