@@ -22,9 +22,6 @@ public class PostConfig : IEntityTypeConfiguration<Post>
         builder.Property(post => post.Description)
             .IsRequired();
 
-        builder.Property(post => post.Platform)
-            .IsRequired();
-
         // Configure the relationship between Post and Header
         builder.HasOne(post => post.Header)
             .WithOne(header => header.Post)
@@ -33,9 +30,15 @@ public class PostConfig : IEntityTypeConfiguration<Post>
             .OnDelete(DeleteBehavior.Cascade);
 
         // Configure the relationship between Post and Images
-        builder.HasMany(post => post.Images)
+        builder.HasMany(post => post.PostImages)
             .WithOne(image => image.Post)
             .HasForeignKey(image => image.PostId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(post => post.PostOptions)
+            .WithOne(postOptions => postOptions.Post)
+            .HasForeignKey<PostOptions>(postOptions => postOptions.PostId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 

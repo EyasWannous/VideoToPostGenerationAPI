@@ -31,6 +31,9 @@ public class AudioConfig : IEntityTypeConfiguration<Audio>
         builder.Property(audio => audio.Duration)
             .IsRequired();
 
+        builder.Property(audio => audio.HasVideo)
+            .IsRequired();
+
         builder.Property(audio => audio.UserId)
             .IsRequired();
 
@@ -46,6 +49,13 @@ public class AudioConfig : IEntityTypeConfiguration<Audio>
             .WithOne(posts => posts.Audio)
             .HasForeignKey(posts => posts.AudioId)
             .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Configure the relationship between Audio and VideoThumbnail
+        builder.HasOne(audio => audio.VideoThumbnail)
+            .WithOne(videoThumbnail => videoThumbnail.Audio)
+            .HasForeignKey<VideoThumbnail>(videoThumbnail => videoThumbnail.AudioId)
+            .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Specify the table name for the Audio entity
