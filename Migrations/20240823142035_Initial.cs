@@ -166,6 +166,7 @@ namespace VideoToPostGenerationAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AudioExtension = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Duration = table.Column<int>(type: "int", nullable: false),
                     Transcript = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -194,7 +195,6 @@ namespace VideoToPostGenerationAPI.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Platform = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AudioId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -235,6 +235,28 @@ namespace VideoToPostGenerationAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "VideoThumbnails",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Link = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AudioId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_VideoThumbnails", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_VideoThumbnails_Audios_AudioId",
+                        column: x => x.AudioId,
+                        principalTable: "Audios",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Headers",
                 columns: table => new
                 {
@@ -257,7 +279,7 @@ namespace VideoToPostGenerationAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Images",
+                name: "PostImages",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -271,9 +293,37 @@ namespace VideoToPostGenerationAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Images", x => x.Id);
+                    table.PrimaryKey("PK_PostImages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Images_Posts_PostId",
+                        name: "FK_PostImages_Posts_PostId",
+                        column: x => x.PostId,
+                        principalTable: "Posts",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PostsOptions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Platform = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PointOfView = table.Column<int>(type: "int", nullable: false),
+                    PrimaryKeyPhrase = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PostFormat = table.Column<int>(type: "int", nullable: false),
+                    UseEmojis = table.Column<bool>(type: "bit", nullable: false),
+                    AdditionalPrompt = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WordCount = table.Column<int>(type: "int", nullable: false),
+                    PostId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PostsOptions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PostsOptions_Posts_PostId",
                         column: x => x.PostId,
                         principalTable: "Posts",
                         principalColumn: "Id",
@@ -319,14 +369,20 @@ namespace VideoToPostGenerationAPI.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Images_PostId",
-                table: "Images",
+                name: "IX_PostImages_PostId",
+                table: "PostImages",
                 column: "PostId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Posts_AudioId",
                 table: "Posts",
                 column: "AudioId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PostsOptions_PostId",
+                table: "PostsOptions",
+                column: "PostId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -343,6 +399,12 @@ namespace VideoToPostGenerationAPI.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Videos_AudioId",
                 table: "Videos",
+                column: "AudioId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VideoThumbnails_AudioId",
+                table: "VideoThumbnails",
                 column: "AudioId",
                 unique: true);
         }
@@ -369,10 +431,16 @@ namespace VideoToPostGenerationAPI.Migrations
                 name: "Headers");
 
             migrationBuilder.DropTable(
-                name: "Images");
+                name: "PostImages");
+
+            migrationBuilder.DropTable(
+                name: "PostsOptions");
 
             migrationBuilder.DropTable(
                 name: "Videos");
+
+            migrationBuilder.DropTable(
+                name: "VideoThumbnails");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

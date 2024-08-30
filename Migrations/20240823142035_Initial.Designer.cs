@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VideoToPostGenerationAPI.Presistence.Data;
 
@@ -11,9 +12,11 @@ using VideoToPostGenerationAPI.Presistence.Data;
 namespace VideoToPostGenerationAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240823142035_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,9 +176,6 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("int");
 
-                    b.Property<bool>("HasVideo")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -255,9 +255,6 @@ namespace VideoToPostGenerationAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Rate")
-                        .HasColumnType("float");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -279,9 +276,8 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ImageExtension")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("ImageExtension")
+                        .HasColumnType("int");
 
                     b.Property<string>("Link")
                         .IsRequired()
@@ -330,6 +326,10 @@ namespace VideoToPostGenerationAPI.Migrations
 
                     b.Property<int>("PostId")
                         .HasColumnType("int");
+
+                    b.Property<string>("PrimaryKeyPhrase")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -573,7 +573,7 @@ namespace VideoToPostGenerationAPI.Migrations
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.PostImage", b =>
                 {
                     b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Post", "Post")
-                        .WithMany("PostImages")
+                        .WithMany("Images")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -626,7 +626,7 @@ namespace VideoToPostGenerationAPI.Migrations
                 {
                     b.Navigation("Header");
 
-                    b.Navigation("PostImages");
+                    b.Navigation("Images");
 
                     b.Navigation("PostOptions")
                         .IsRequired();

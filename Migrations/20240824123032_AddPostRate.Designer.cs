@@ -12,8 +12,8 @@ using VideoToPostGenerationAPI.Presistence.Data;
 namespace VideoToPostGenerationAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240802192537_Initial")]
-    partial class Initial
+    [Migration("20240824123032_AddPostRate")]
+    partial class AddPostRate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,12 +176,19 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Property<int>("Duration")
                         .HasColumnType("int");
 
+                    b.Property<bool>("HasVideo")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("SizeBytes")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Transcript")
                         .IsRequired()
@@ -233,40 +240,6 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.ToTable("Headers", (string)null);
                 });
 
-            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Image", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ImageExtension")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Link")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("PostId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("SizeBytes")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PostId");
-
-                    b.ToTable("Images", (string)null);
-                });
-
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -285,9 +258,8 @@ namespace VideoToPostGenerationAPI.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Platform")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("Rate")
+                        .HasColumnType("float");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -297,6 +269,90 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.HasIndex("AudioId");
 
                     b.ToTable("Posts", (string)null);
+                });
+
+            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.PostImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ImageExtension")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.ToTable("PostImages", (string)null);
+                });
+
+            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.PostOptions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdditionalPrompt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Platform")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("PointOfView")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PostFormat")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PrimaryKeyPhrase")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("UseEmojis")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("WordCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId")
+                        .IsUnique();
+
+                    b.ToTable("PostsOptions", (string)null);
                 });
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.User", b =>
@@ -409,6 +465,35 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.ToTable("Videos", (string)null);
                 });
 
+            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.VideoThumbnail", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AudioId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AudioId")
+                        .IsUnique();
+
+                    b.ToTable("VideoThumbnails", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<int>", null)
@@ -481,17 +566,6 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Navigation("Post");
                 });
 
-            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Image", b =>
-                {
-                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Post", "Post")
-                        .WithMany("Images")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
-                });
-
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Post", b =>
                 {
                     b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Audio", "Audio")
@@ -501,6 +575,28 @@ namespace VideoToPostGenerationAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Audio");
+                });
+
+            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.PostImage", b =>
+                {
+                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Post", "Post")
+                        .WithMany("PostImages")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+                });
+
+            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.PostOptions", b =>
+                {
+                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Post", "Post")
+                        .WithOne("PostOptions")
+                        .HasForeignKey("VideoToPostGenerationAPI.Domain.Entities.PostOptions", "PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Video", b =>
@@ -513,18 +609,34 @@ namespace VideoToPostGenerationAPI.Migrations
                     b.Navigation("Audio");
                 });
 
+            modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.VideoThumbnail", b =>
+                {
+                    b.HasOne("VideoToPostGenerationAPI.Domain.Entities.Audio", "Audio")
+                        .WithOne("VideoThumbnail")
+                        .HasForeignKey("VideoToPostGenerationAPI.Domain.Entities.VideoThumbnail", "AudioId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Audio");
+                });
+
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Audio", b =>
                 {
                     b.Navigation("Posts");
 
                     b.Navigation("Video");
+
+                    b.Navigation("VideoThumbnail")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.Post", b =>
                 {
                     b.Navigation("Header");
 
-                    b.Navigation("Images");
+                    b.Navigation("PostImages");
+
+                    b.Navigation("PostOptions")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("VideoToPostGenerationAPI.Domain.Entities.User", b =>
