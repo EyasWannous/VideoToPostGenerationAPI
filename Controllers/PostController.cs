@@ -13,9 +13,6 @@ using VideoToPostGenerationAPI.DTOs.Outgoing;
 
 namespace VideoToPostGenerationAPI.Controllers;
 
-/// <summary>
-/// Controller for handling post-related operations.
-/// </summary>
 [Authorize]
 public class PostController : BaseController
 {
@@ -23,13 +20,6 @@ public class PostController : BaseController
     private readonly UserManager<User> _userManager;
     private readonly IFileService _fileService;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PostController"/> class.
-    /// </summary>
-    /// <param name="unitOfWork">The unit of work.</param>
-    /// <param name="mapper">The mapper.</param>
-    /// <param name="postService">The post service.</param>
-    /// <param name="userManager">The user manager.</param>
     public PostController(IUnitOfWork unitOfWork, IMapper mapper, IGenerationService postService, UserManager<User> userManager, IFileService fileService)
         : base(unitOfWork, mapper)
     {
@@ -38,21 +28,6 @@ public class PostController : BaseController
         _fileService = fileService;
     }
 
-    /// <summary>
-    /// Generates a new post for a video on a specified platform.
-    /// </summary>
-    /// <param name="audioId">The ID of the video.</param>
-    /// <param name="platform">The platform for which to generate the post.</param>
-    /// <returns>A newly created post related to the specified video and platform.</returns>
-    /// <remarks>
-    /// Sample request:
-    ///
-    ///     GET /{audioId:int}?platform=Blog
-    ///
-    /// </remarks>
-    /// <response code="200">Returns the newly created post.</response>
-    /// <response code="400">If the video does not exist or the user is not authorized.</response>
-    /// <response code="500">If there is an internal server error.</response>
     [HttpPost("{audioId:int}")]
     public async Task<IActionResult> GetPosts([FromRoute] int audioId, [FromBody] RequestPostDTO requestPostDTO)
     {
@@ -65,7 +40,6 @@ public class PostController : BaseController
         // Convert the input string to lowercase to compare case-insensitively
         string platformString = requestPostDTO.Platform.ToLower();
 
-        //// Try to parse the string to the enum
         //bool isValidPlatform = Enum.TryParse<Platform>(platformString, true, out _);
 
         //if (!isValidPlatform)
@@ -104,7 +78,6 @@ public class PostController : BaseController
             return StatusCode(500, "Internal Server Error");
 
         //var tasks = new List<Task<string>>();
-        ////var images = new List<string>();
 
         //foreach (var imageUrl in postResponse.Images)
         //{
@@ -169,19 +142,6 @@ public class PostController : BaseController
         return Ok(_mapper.Map<ResponsePostDTO>(post));
     }
 
-    /// <summary>
-    /// Retrieves old posts for a video.
-    /// </summary>
-    /// <param name="audioId">The ID of the video.</param>
-    /// <returns>A list of old posts related to the specified video.</returns>
-    /// <remarks>
-    /// Sample request:
-    ///
-    ///     GET /old/{audioId:int}
-    ///
-    /// </remarks>
-    /// <response code="200">Returns a list of old posts.</response>
-    /// <response code="400">If the video does not exist or the user is not authorized.</response>
     [HttpGet("old/{audioId:int}")]
     public async Task<IActionResult> GetOldPosts([FromRoute] int audioId)
     {
@@ -198,21 +158,6 @@ public class PostController : BaseController
         return Ok(result);
     }
 
-    /// <summary>
-    /// Generates posts for a video using WebSocket on a specified platform.
-    /// </summary>
-    /// <param name="audioId">The ID of the video.</param>
-    /// <param name="platform">The platform for which to generate the post.</param>
-    /// <returns>No content if successful, otherwise an error status.</returns>
-    /// <remarks>
-    /// Sample request:
-    ///
-    ///     GET /ws/{audioId:int}?platform=Blog
-    ///
-    /// </remarks>
-    /// <response code="204">No content if successful.</response>
-    /// <response code="400">If the video does not exist or the user is not authorized.</response>
-    /// <response code="500">If there is an internal server error.</response>
     [HttpGet("ws/{audioId:int}")]
     public async Task<IActionResult> GetPostWS([FromRoute] int audioId, [FromBody] RequestPostDTO requestPostDTO)
     {

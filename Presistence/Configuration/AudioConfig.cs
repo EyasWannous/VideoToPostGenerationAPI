@@ -4,15 +4,8 @@ using VideoToPostGenerationAPI.Domain.Entities;
 
 namespace VideoToPostGenerationAPI.Presistence.Configuration;
 
-/// <summary>
-/// Configures the entity type <see cref="Audio"/> for Entity Framework.
-/// </summary>
 public class AudioConfig : IEntityTypeConfiguration<Audio>
 {
-    /// <summary>
-    /// Configures the <see cref="Audio"/> entity with the specified <see cref="EntityTypeBuilder{Audio}"/>.
-    /// </summary>
-    /// <param name="builder">The builder used to configure the entity.</param>
     public void Configure(EntityTypeBuilder<Audio> builder)
     {
         // Define the primary key for the Audio entity

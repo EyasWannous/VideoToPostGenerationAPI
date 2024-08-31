@@ -4,15 +4,8 @@ using VideoToPostGenerationAPI.DTOs.Outgoing;
 
 namespace VideoToPostGenerationAPI.Services.Helpers;
 
-/// <summary>
-/// AutoMapper profile to configure mappings between domain entities and DTOs.
-/// </summary>
 public class MappingProfile : Profile
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MappingProfile"/> class.
-    /// Configures the mappings between domain entities and DTOs.
-    /// </summary>
     public MappingProfile()
     {
         // Map Audio entity to ResponseAudioDTO
@@ -40,5 +33,5 @@ public class MappingProfile : Profile
         CreateMap<PostImage, ResponsePostImageDTO>()
             .ReverseMap();
     }
-    
+
 }

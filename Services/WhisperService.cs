@@ -5,9 +5,6 @@ using VideoToPostGenerationAPI.DTOs.Incoming;
 
 namespace VideoToPostGenerationAPI.Services;
 
-/// <summary>
-/// Service for interacting with the Whisper API to get transcriptions of audio files.
-/// </summary>
 public class WhisperService : IWhisperService, IDisposable
 {
     private bool _disposed = false;
@@ -15,11 +12,6 @@ public class WhisperService : IWhisperService, IDisposable
     private readonly HttpClient _client;
     private readonly IWebHostEnvironment _env;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="WhisperService"/> class.
-    /// </summary>
-    /// <param name="env">The environment in which the application is running.</param>
-    /// <param name="client">The HTTP client used to send requests.</param>
     public WhisperService(IWebHostEnvironment env, HttpClient client)
     {
         _env = env;
@@ -29,17 +21,6 @@ public class WhisperService : IWhisperService, IDisposable
         _client.Timeout = TimeSpan.FromMinutes(30);
     }
 
-    /// <summary>
-    /// Gets the transcription of the audio file at the specified file path.
-    /// </summary>
-    /// <param name="filePath">The path to the audio file.</param>
-    /// <returns>A <see cref="TranscriptionResponse"/> object containing the transcription, or null if the request fails.</returns>
-    /// <remarks>
-    /// Sample usage:
-    ///
-    ///     var transcription = await whisperService.GetTranscriptAsync("path/to/audio/file.mp3");
-    ///
-    /// </remarks>
     public async Task<TranscriptionResponse?> GetTranscriptAsync(string filePath)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, "");
@@ -67,10 +48,6 @@ public class WhisperService : IWhisperService, IDisposable
         return JsonSerializer.Deserialize<TranscriptionResponse>(responseContent);
     }
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="WhisperService"/> and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed)
@@ -84,9 +61,6 @@ public class WhisperService : IWhisperService, IDisposable
         _disposed = true;
     }
 
-    /// <summary>
-    /// Releases all resources used by the current instance of the <see cref="WhisperService"/> class.
-    /// </summary>
     public void Dispose()
     {
         Dispose(true);

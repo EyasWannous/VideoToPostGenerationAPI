@@ -4,15 +4,8 @@ using VideoToPostGenerationAPI.Domain.Entities;
 
 namespace VideoToPostGenerationAPI.Presistence.Configuration;
 
-/// <summary>
-/// Configures the entity type <see cref="Post"/> for Entity Framework.
-/// </summary>
 public class PostConfig : IEntityTypeConfiguration<Post>
 {
-    /// <summary>
-    /// Configures the <see cref="Post"/> entity with the specified <see cref="EntityTypeBuilder{Post}"/>.
-    /// </summary>
-    /// <param name="builder">The builder used to configure the entity.</param>
     public void Configure(EntityTypeBuilder<Post> builder)
     {
         // Define the primary key for the Post entity

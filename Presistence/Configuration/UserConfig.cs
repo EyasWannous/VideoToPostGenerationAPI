@@ -4,15 +4,8 @@ using VideoToPostGenerationAPI.Domain.Entities;
 
 namespace VideoToPostGenerationAPI.Presistence.Configuration;
 
-/// <summary>
-/// Configures the entity type <see cref="User"/> for Entity Framework.
-/// </summary>
 public class UserConfig : IEntityTypeConfiguration<User>
 {
-    /// <summary>
-    /// Configures the <see cref="User"/> entity with the specified <see cref="EntityTypeBuilder{User}"/>.
-    /// </summary>
-    /// <param name="builder">The builder used to configure the entity.</param>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         // Configure the one-to-many relationship between User and Audio

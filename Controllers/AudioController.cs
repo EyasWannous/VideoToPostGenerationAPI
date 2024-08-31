@@ -13,9 +13,6 @@ using VideoToPostGenerationAPI.DTOs.Outgoing;
 
 namespace VideoToPostGenerationAPI.Controllers;
 
-/// <summary>
-/// Controller to manage audio-related operations.
-/// </summary>
 [Authorize]
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileService fileService,
@@ -28,20 +25,6 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
     private readonly IGenerationService _generationService = generationService;
     private readonly UserManager<User> _userManager = userManager;
 
-    /// <summary>
-    /// Uploads an audio file.
-    /// </summary>
-    /// <param name="file">The audio file to upload.</param>
-    /// <returns>Action result of the upload operation.</returns>
-    /// <remarks>
-    /// Sample request:
-    ///
-    ///     POST /Audio/upload
-    ///     {
-    ///        "file": "file content"
-    ///     }
-    ///
-    /// </remarks>
     [HttpPost("upload")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -93,17 +76,6 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         return CreatedAtAction(nameof(GetAudioById), new { id = audio.Id }, _mapper.Map<ResponseAudioDTO>(audio));
     }
 
-    /// <summary>
-    /// Downloads audio from a YouTube link.
-    /// </summary>
-    /// <param name="link">The YouTube link to download audio from.</param>
-    /// <returns>Action result of the download operation.</returns>
-    /// <remarks>
-    /// Sample request:
-    ///
-    ///     GET /Audio/youtubeLink?link=https://youtube.com/example
-    ///
-    /// </remarks>
     [HttpGet("youtubeLink")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -135,7 +107,7 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
             return BadRequest("Could not get transcript from youtube, please try again");
 
         var title = await _youTubeService.GetVideoTitleAsync(link);
-        if(title is null)
+        if (title is null)
             return BadRequest("Could not make title for this file, please try again");
 
         var audio = new Audio
@@ -166,16 +138,6 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         );
     }
 
-    /// <summary>
-    /// Retrieves all audio files of the logged-in user.
-    /// </summary>
-    /// <returns>Action result containing the list of audio files.</returns>
-    /// <remarks>
-    /// Sample request:
-    ///
-    ///     GET /Audio/all
-    ///
-    /// </remarks>
     [HttpGet("all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllAudios()
@@ -189,17 +151,6 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         return Ok(mappedAudios);
     }
 
-    /// <summary>
-    /// Retrieves an audio file by its ID.
-    /// </summary>
-    /// <param name="id">The ID of the audio file.</param>
-    /// <returns>Action result containing the audio file.</returns>
-    /// <remarks>
-    /// Sample request:
-    ///
-    ///     GET /Audio/{id}
-    ///
-    /// </remarks>
     [HttpGet("{id:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -214,17 +165,6 @@ public class AudioController(IUnitOfWork unitOfWork, IMapper mapper, IFileServic
         return Ok(_mapper.Map<ResponseAudioDTO>(audio));
     }
 
-    /// <summary>
-    /// Deletes an audio file by its ID.
-    /// </summary>
-    /// <param name="id">The ID of the audio file.</param>
-    /// <returns>No content result.</returns>
-    /// <remarks>
-    /// Sample request:
-    ///
-    ///     DELETE /Audio/{id}
-    ///
-    /// </remarks>
     [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

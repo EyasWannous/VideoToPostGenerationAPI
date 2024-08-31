@@ -4,29 +4,17 @@ using VideoToPostGenerationAPI.Domain.Settings;
 
 namespace VideoToPostGenerationAPI.Presistence.BackgroundJobs;
 
-/// <summary>
-/// Background job for deleting old files.
-/// </summary>
 public class DeletingFilesBackgroundJob : IJob
 {
     private readonly ILogger<DeletingFilesBackgroundJob> _logger;
     private readonly IFileService _fileService;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DeletingFilesBackgroundJob"/> class.
-    /// </summary>
-    /// <param name="logger">The logger instance.</param>
-    /// <param name="fileService">The file service instance.</param>
     public DeletingFilesBackgroundJob(ILogger<DeletingFilesBackgroundJob> logger, IFileService fileService)
     {
         _logger = logger;
         _fileService = fileService;
     }
 
-    /// <summary>
-    /// Executes the job to delete old files.
-    /// </summary>
-    /// <param name="context">The job execution context.</param>
     public async Task Execute(IJobExecutionContext context)
     {
         var files = new List<string>();

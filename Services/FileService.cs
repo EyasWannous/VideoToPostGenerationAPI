@@ -10,31 +10,17 @@ using VideoToPostGenerationAPI.Services.Helpers;
 
 namespace VideoToPostGenerationAPI.Services;
 
-/// <summary>
-/// Service for handling file operations including upload, read, delete, compress, decompress, and video-to-audio conversion.
-/// </summary>
 public class FileService : IFileService
 {
     private readonly IWebHostEnvironment _env;
     private readonly HttpClient _client;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FileService"/> class.
-    /// </summary>
-    /// <param name="env">The web hosting environment.</param>
     public FileService(IWebHostEnvironment env, HttpClient client)
     {
         _env = env;
         _client = client;
     }
 
-    /// <summary>
-    /// Stores a file asynchronously in the specified path.
-    /// </summary>
-    /// <typeparam name="TEnum">The type of enum used to validate file extensions.</typeparam>
-    /// <param name="file">The file to store.</param>
-    /// <param name="filePath">The path where the file should be stored.</param>
-    /// <returns>A <see cref="ResponseUploadFileDTO"/> indicating the result of the operation.</returns>
     public async Task<ResponseUploadFileDTO> StoreAsync<TEnum>(IFormFile file, string filePath) where TEnum : struct, Enum
     {
         var extension = Path.GetExtension(file.FileName);
@@ -71,41 +57,25 @@ public class FileService : IFileService
         };
     }
 
-    /// <summary>
-    /// Reads a file's contents asynchronously.
-    /// </summary>
-    /// <param name="filePath">The path to the file to read.</param>
-    /// <returns>A byte array containing the file's contents.</returns>
     public async Task<byte[]> ReadAsync(string filePath)
     {
         var fullPath = Path.Combine(_env.WebRootPath, filePath);
         return await File.ReadAllBytesAsync(fullPath);
     }
 
-    /// <summary>
-    /// Deletes a file asynchronously.
-    /// </summary>
-    /// <param name="filePath">The path to the file to delete.</param>
     public Task DeleteFileAsync(string filePath)
     {
         if (string.IsNullOrWhiteSpace(filePath))
             return Task.CompletedTask;
 
         var fullPath = Path.Combine(_env.WebRootPath, filePath);
-        
+
         if (File.Exists(fullPath))
             File.Delete(fullPath);
 
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Creates a <see cref="IFormFile"/> from a byte array asynchronously.
-    /// </summary>
-    /// <param name="fileBytes">The byte array representing the file's contents.</param>
-    /// <param name="fileName">The name of the file.</param>
-    /// <param name="contentType">The MIME type of the file.</param>
-    /// <returns>A task representing the asynchronous operation, with an <see cref="IFormFile"/> as the result.</returns>
     public async Task<IFormFile> MakeFileAsync(byte[] fileBytes, string fileName, string contentType)
     {
         var memoryStream = new MemoryStream(fileBytes);
@@ -118,10 +88,6 @@ public class FileService : IFileService
         return await Task.FromResult(file);
     }
 
-    /// <summary>
-    /// Compresses a file asynchronously.
-    /// </summary>
-    /// <param name="filePath">The path to the file to compress.</param>
     public Task CompressAsync(string filePath)
     {
         var fullPath = Path.Combine(_env.WebRootPath, filePath);
@@ -132,10 +98,6 @@ public class FileService : IFileService
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Decompresses a file asynchronously.
-    /// </summary>
-    /// <param name="filePath">The path to the file to decompress.</param>
     public Task DecompressAsync(string filePath)
     {
         var fullPath = Path.Combine(_env.WebRootPath, filePath);
@@ -146,11 +108,6 @@ public class FileService : IFileService
         return Task.CompletedTask;
     }
 
-    /// <summary>
-    /// Converts a video file to an audio file asynchronously.
-    /// </summary>
-    /// <param name="filePath">The path to the video file to convert.</param>
-    /// <returns>A task representing the asynchronous operation, with the path to the converted audio file as the result.</returns>
     public Task<string> ConvertVideoToAudioAsync(string filePath)
     {
         var inputFullPath = Path.Combine(_env.WebRootPath, filePath);
@@ -163,13 +120,6 @@ public class FileService : IFileService
         return Task.FromResult(outputFullPath);
     }
 
-    /// <summary>
-    /// Downloads a file from a URL asynchronously.
-    /// </summary>
-    /// <param name="folderPath">The folder path where the file should be stored.</param>
-    /// <param name="link">The URL of the file to download.</param>
-    /// <param name="downloadAudio">Indicates whether to download audio instead of video.</param>
-    /// <returns>A task representing the asynchronous operation, with the path to the downloaded file as the result.</returns>
     public async Task<string?> DownloadFileAsync(string folderPath, string link, bool downloadAudio)
     {
         var fileGuid = Guid.NewGuid().ToString();
@@ -206,11 +156,6 @@ public class FileService : IFileService
         return await GetFileByGuidIdAsync(fileGuid, folderPath);
     }
 
-    /// <summary>
-    /// Gets the duration of a video file in seconds asynchronously.
-    /// </summary>
-    /// <param name="filePath">The path to the video file.</param>
-    /// <returns>A task representing the asynchronous operation, with the duration in seconds as the result.</returns>
     public Task<int> GetDurationAsync(string filePath)
     {
         var fullPath = Path.Combine(_env.WebRootPath, filePath);
@@ -221,11 +166,6 @@ public class FileService : IFileService
         return Task.FromResult((int)Math.Ceiling(videoInfo.Duration.TotalSeconds));
     }
 
-    /// <summary>
-    /// Gets the content type of a file asynchronously.
-    /// </summary>
-    /// <param name="filePath">The path to the file.</param>
-    /// <returns>A task representing the asynchronous operation, with the content type of the file as the result.</returns>
     public Task<string?> GetContentTypeAsync(string filePath)
     {
         var fileProvider = new FileExtensionContentTypeProvider();
@@ -235,11 +175,6 @@ public class FileService : IFileService
         return Task.FromResult<string?>(contentType);
     }
 
-    /// <summary>
-    /// Gets the size of a file in bytes asynchronously.
-    /// </summary>
-    /// <param name="filePath">The path to the file.</param>
-    /// <returns>A task representing the asynchronous operation, with the file size in bytes as the result.</returns>
     public Task<long> GetFileSizeAsync(string filePath)
     {
         var fullPath = Path.Combine(_env.WebRootPath, filePath);
@@ -248,12 +183,6 @@ public class FileService : IFileService
         return Task.FromResult(fileInfo.Length);
     }
 
-    /// <summary>
-    /// Gets a file name by its GUID from the specified folder path asynchronously.
-    /// </summary>
-    /// <param name="fileName">The GUID part of the file name to search for.</param>
-    /// <param name="folderPath">The folder path to search in.</param>
-    /// <returns>A task representing the asynchronous operation, with the matching file name as the result.</returns>
     public Task<string?> GetFileByGuidIdAsync(string fileName, string folderPath)
     {
         var fullPath = Path.Combine(_env.WebRootPath, folderPath);
@@ -263,13 +192,6 @@ public class FileService : IFileService
         return Task.FromResult(matchFile);
     }
 
-    /// <summary>
-    /// Retrieves all files from the specified folder path.
-    /// </summary>
-    /// <param name="folderPath">The relative path to the folder from which to retrieve files.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains a list of file paths.</returns>
-    /// <exception cref="DirectoryNotFoundException">Thrown if the specified folder path does not exist.</exception>
-    /// <exception cref="IOException">Thrown if an I/O error occurs while accessing the file system.</exception>
     public Task<List<string>> GetAllFilesAsync(string folderPath)
     {
         var fullPath = Path.Combine(_env.WebRootPath, folderPath);

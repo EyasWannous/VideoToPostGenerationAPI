@@ -15,9 +15,6 @@ using VideoToPostGenerationAPI.Presistence.Hubs;
 
 namespace VideoToPostGenerationAPI.Controllers;
 
-/// <summary>
-/// Controller for handling broadcasting and receiving messages via SignalR and WebSocket.
-/// </summary>
 [Authorize]
 public class BroadcastController : BaseController
 {
@@ -25,14 +22,6 @@ public class BroadcastController : BaseController
     private readonly UserManager<User> _userManager;
     private readonly IWebSocketClientService _webSocketClientServiceR;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="BroadcastController"/> class.
-    /// </summary>
-    /// <param name="hubContext">The hub context for SignalR communication.</param>
-    /// <param name="webSocketClientServiceR">The WebSocket client service.</param>
-    /// <param name="userManager">The user manager service.</param>
-    /// <param name="unitOfWork">The unit of work for data access.</param>
-    /// <param name="mapper">The AutoMapper instance.</param>
     public BroadcastController(IHubContext<PostHub, IPostClient> hubContext,
         IWebSocketClientService webSocketClientServiceR, UserManager<User> userManager,
         IUnitOfWork unitOfWork, IMapper mapper) : base(unitOfWork, mapper)
@@ -42,12 +31,6 @@ public class BroadcastController : BaseController
         _webSocketClientServiceR = webSocketClientServiceR;
     }
 
-    /// <summary>
-    /// Broadcasts a message to the logged-in user via SignalR.
-    /// </summary>
-    /// <param name="message">The message to broadcast.</param>
-    /// <returns>An action result indicating the outcome of the operation.</returns>
-    /// <response code="204">No content if the broadcast is successful.</response>
     [HttpPost("broadcast")]
     public async Task<IActionResult> BroadcastMessage(string message)
     {
@@ -57,12 +40,6 @@ public class BroadcastController : BaseController
         return NoContent();
     }
 
-    /// <summary>
-    /// Receives messages from a WebSocket and broadcasts them to the logged-in user via SignalR.
-    /// </summary>
-    /// <returns>An action result containing the list of received messages.</returns>
-    /// <response code="200">Returns the list of received messages.</response>
-    /// <response code="500">If there is an internal server error during the WebSocket operations.</response>
     [HttpGet("receive")]
     public async Task<IActionResult> ReceiveMessage()
     {
@@ -76,7 +53,7 @@ public class BroadcastController : BaseController
         {
             Link = audio?.YoutubeLink,
             Script = audio?.Transcript ?? "No Transcript",
-            PostOptionsRequest = new PostOptionsRequest { Platform = ""},
+            PostOptionsRequest = new PostOptionsRequest { Platform = "" },
         };
 
         var json = JsonSerializer.Serialize(postRequest);

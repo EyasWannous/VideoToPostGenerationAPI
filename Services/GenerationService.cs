@@ -14,9 +14,6 @@ using VideoToPostGenerationAPI.Presistence.Hubs;
 
 namespace VideoToPostGenerationAPI.Services;
 
-/// <summary>
-/// Service for generating posts for different platforms.
-/// </summary>
 public class GenerationService : IGenerationService
 {
     private bool _disposed = false;
@@ -28,12 +25,6 @@ public class GenerationService : IGenerationService
     private readonly IWebHostEnvironment _env;
 
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GenerationService"/> class.
-    /// </summary>
-    /// <param name="client">The HTTP client used for making requests.</param>
-    /// <param name="hubContext">The SignalR hub context for sending real-time updates to clients.</param>
-    /// <param name="webSocketClientServiceR">The WebSocket client service for real-time communication.</param>
     public GenerationService(HttpClient client, IHubContext<PostHub, IPostClient> hubContext, IWebSocketClientService webSocketClientServiceR, IWebHostEnvironment env)
     {
         _env = env;
@@ -62,12 +53,6 @@ public class GenerationService : IGenerationService
         return JsonSerializer.Deserialize<TitleResponse>(responseContent);
     }
 
-    /// <summary>
-    /// Generates a post for the specified platform based on the provided post request.
-    /// </summary>
-    /// <param name="post">The post request containing details for the post generation.</param>
-    /// <param name="platform">The platform for which the post is to be generated.</param>
-    /// <returns>A <see cref="PostResponse"/> object containing the generated post details, or null if the generation fails.</returns>
     //public async Task<PostResponse?> GetPostAsync(PostRequest post, string platform)
     //{
     //    var json = JsonSerializer.Serialize(post);
@@ -85,13 +70,6 @@ public class GenerationService : IGenerationService
     //    return JsonSerializer.Deserialize<PostResponse>(responseContent);
     //}
 
-    /// <summary>
-    /// Generates a list of posts for the specified platform based on the provided post request using WebSocket communication.
-    /// </summary>
-    /// <param name="userId">The user ID for identifying the client connection.</param>
-    /// <param name="post">The post request containing details for the post generation.</param>
-    /// <param name="platform">The platform for which the post is to be generated.</param>
-    /// <returns>A list of <see cref="PostResponse"/> objects containing the generated post details.</returns>
     public async Task<List<PostResponse?>> GetPostWSAsync(string userId, PostRequest post, string platform)
     {
         var json = JsonSerializer.Serialize(post);
@@ -134,7 +112,7 @@ public class GenerationService : IGenerationService
 
         var responseContent = await postResponse.Content.ReadAsStringAsync();
         var postResult = JsonSerializer.Deserialize<PostResponse>(responseContent);
-        
+
         if (postResult is null)
             return null;
 
@@ -152,11 +130,11 @@ public class GenerationService : IGenerationService
 
         //    if (!imagesResponse.IsSuccessStatusCode)
         //        return null;
-            
+
         //    var imagesResponseContent = await imagesResponse.Content.ReadAsStringAsync();
-            
+
         //    var imagesResult = JsonSerializer.Deserialize<ImagesResponse>(imagesResponseContent);
-            
+
         //    postResult.Images = imagesResult?.Images ?? [];
         //}
 
@@ -201,10 +179,6 @@ public class GenerationService : IGenerationService
         return true;
     }
 
-    /// <summary>
-    /// Releases the unmanaged resources used by the <see cref="GenerationService"/> and optionally releases the managed resources.
-    /// </summary>
-    /// <param name="disposing">A boolean value indicating whether to release both managed and unmanaged resources.</param>
     protected virtual void Dispose(bool disposing)
     {
         if (_disposed)
@@ -218,9 +192,6 @@ public class GenerationService : IGenerationService
         _disposed = true;
     }
 
-    /// <summary>
-    /// Releases all resources used by the current instance of the <see cref="GenerationService"/> class.
-    /// </summary>
     public void Dispose()
     {
         Dispose(true);

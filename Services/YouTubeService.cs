@@ -3,34 +3,16 @@ using YoutubeExplode;
 
 namespace VideoToPostGenerationAPI.Services;
 
-/// <summary>
-/// Service for interacting with YouTube to retrieve video captions.
-/// </summary>
 public class YouTubeService : IYouTubeService
 {
     private readonly YoutubeClient _youtubeClient;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="YouTubeService"/> class.
-    /// </summary>
     public YouTubeService(HttpClient client)
     {
         client.Timeout = TimeSpan.FromMinutes(30);
         _youtubeClient = new YoutubeClient(http: client);
     }
 
-    /// <summary>
-    /// Retrieves the captions for a YouTube video in the specified language.
-    /// </summary>
-    /// <param name="videoURL">The URL of the YouTube video.</param>
-    /// <param name="languagePrefix">The language prefix for the desired captions (e.g., "en" for English).</param>
-    /// <returns>The concatenated captions as a single string, or null if captions are not available in the specified language.</returns>
-    /// <remarks>
-    /// Sample usage:
-    ///
-    ///     var captions = await youTubeService.GetVideoCaptions("https://www.youtube.com/watch?v=example", "en");
-    ///
-    /// </remarks>
     public async Task<string?> GetVideoCaptions(string videoURL, string languagePrefix)
     {
         try
@@ -56,11 +38,6 @@ public class YouTubeService : IYouTubeService
         }
     }
 
-    /// <summary>
-    /// Retrieves the title of a YouTube video.
-    /// </summary>
-    /// <param name="videoURL">The URL of the YouTube video.</param>
-    /// <returns>The title of the video as a string.</returns>
     public async Task<string> GetVideoTitleAsync(string videoURL)
     {
         try
@@ -75,11 +52,6 @@ public class YouTubeService : IYouTubeService
         }
     }
 
-    /// <summary>
-    /// Retrieves the thumbnail URL of a YouTube video.
-    /// </summary>
-    /// <param name="videoURL">The URL of the YouTube video.</param>
-    /// <returns>The URL of the video thumbnail.</returns>
     public async Task<string?> GetVideoThumbnailUrlAsync(string videoURL)
     {
         try

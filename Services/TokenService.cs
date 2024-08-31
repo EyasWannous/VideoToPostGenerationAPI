@@ -11,30 +11,17 @@ using VideoToPostGenerationAPI.Domain.Settings;
 
 namespace VideoToPostGenerationAPI.Services;
 
-/// <summary>
-/// Service for handling token generation and verification.
-/// </summary>
 public class TokenService : ITokenService
 {
     private readonly JwtOptions _options;
     private readonly TokenValidationParameters _tokenValidationParameters;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TokenService"/> class.
-    /// </summary>
-    /// <param name="options">Options for JWT configuration.</param>
-    /// <param name="tokenValidationParameters">Parameters for validating JWT tokens.</param>
     public TokenService(IOptionsMonitor<JwtOptions> options, TokenValidationParameters tokenValidationParameters)
     {
         _options = options.CurrentValue;
         _tokenValidationParameters = tokenValidationParameters;
     }
 
-    /// <summary>
-    /// Generates a JWT token for the specified user.
-    /// </summary>
-    /// <param name="user">The user for whom to generate the token.</param>
-    /// <returns>A tuple containing the generated JWT token and its expiration date.</returns>
     public async Task<(string JwtToken, DateTime ExpireDate)> GenerateJwtTokenAsync(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -69,11 +56,6 @@ public class TokenService : ITokenService
         return await Task.FromResult((JwtToken: jwtToken, ExpireDate: token.ValidTo));
     }
 
-    /// <summary>
-    /// Verifies the specified JWT token.
-    /// </summary>
-    /// <param name="jwtToken">The JWT token to verify.</param>
-    /// <returns>A tuple containing a message and a boolean indicating whether the token is valid.</returns>
     public async Task<(string Message, bool IsSuccess)> VerfiyTokenAsync(string jwtToken)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
